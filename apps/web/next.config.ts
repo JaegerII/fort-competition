@@ -16,6 +16,12 @@ const nextConfig: NextConfig = {
   images: { unoptimized: true }, // next/image-Optimierungsserver gibt es bei statischem Export nicht
   basePath: isGithubPages ? `/${repoName}` : undefined,
   assetPrefix: isGithubPages ? `/${repoName}/` : undefined,
+  // basePath wird von Next nur bei <Link>/<Image> automatisch berücksichtigt,
+  // nicht bei rohen url()-Strings in CSS/style — daher hier explizit für
+  // Komponenten wie TopographyBackground, die public/-Assets per Hand referenzieren.
+  env: {
+    NEXT_PUBLIC_BASE_PATH: isGithubPages ? `/${repoName}` : "",
+  },
   turbopack: {
     root: path.join(__dirname),
   },
