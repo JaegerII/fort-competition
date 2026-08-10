@@ -81,12 +81,15 @@ export default async function MatchPage({
       )}
 
       <div className="grid gap-8 lg:grid-cols-[1fr_300px]">
-        <div>
+        <div className="order-2 lg:order-none">
           <h2 className="mb-4 text-lg font-semibold">Rangliste</h2>
           <Leaderboard />
         </div>
 
-        <aside className="rounded-2xl border border-border bg-surface p-5 h-fit">
+        {/* Auf Mobile vor die Rangliste — das eigene Ergebnis ist die
+            persönlich relevanteste Info und soll nicht erst nach Scrollen
+            durch eine potenziell lange Liste sichtbar werden. */}
+        <aside className="order-1 h-fit rounded-2xl border border-border bg-surface p-5 lg:order-none">
           <h2 className="mb-4 text-sm font-semibold uppercase tracking-wide text-text-muted">
             Dein Match
           </h2>

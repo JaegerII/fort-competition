@@ -168,7 +168,7 @@ export default function ScorePage() {
   // ── Score-Erfassung ────────────────────────────────────────────
   if (mode === "score") {
     return (
-      <div className="max-w-2xl mx-auto px-4 pb-32 pt-6">
+      <div className="max-w-2xl mx-auto px-4 pb-48 pt-6 md:pb-32">
         <ScoreHeader
           shooter={shooter}
           offline={offline}
@@ -264,7 +264,7 @@ export default function ScorePage() {
 
         <PreviewBar points={points} time={timeNum} hitFactor={hitFactor} />
 
-        <div className="fixed inset-x-0 bottom-0 border-t border-border bg-bg/95 backdrop-blur px-4 py-4">
+        <div className="fixed inset-x-0 bottom-16 border-t border-border bg-bg/95 backdrop-blur px-4 py-4 md:bottom-0">
           <div className="mx-auto max-w-2xl">
             <button
               onClick={() => setMode("review")}
@@ -280,7 +280,7 @@ export default function ScorePage() {
 
   // ── Review & Confirm ───────────────────────────────────────────
   return (
-    <div className="max-w-2xl mx-auto px-4 pb-32 pt-6">
+    <div className="max-w-2xl mx-auto px-4 pb-48 pt-6 md:pb-32">
       <ScoreHeader
         shooter={shooter}
         offline={offline}
@@ -318,7 +318,7 @@ export default function ScorePage() {
 
       <PreviewBar points={points} time={timeNum} hitFactor={hitFactor} />
 
-      <div className="fixed inset-x-0 bottom-0 border-t border-border bg-bg/95 backdrop-blur px-4 py-4">
+      <div className="fixed inset-x-0 bottom-16 border-t border-border bg-bg/95 backdrop-blur px-4 py-4 md:bottom-0">
         <div className="mx-auto flex max-w-2xl gap-3">
           <button
             onClick={() => setMode("score")}

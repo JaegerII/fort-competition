@@ -40,12 +40,13 @@ const items: NavItem[] = [
 ];
 
 // Nur für Phone-Breite (md:hidden) — Tablet/Desktop nutzen die Nav im Header.
-// Auf /score bewusst ausgeblendet: der RO-Scoring-Loop hat bereits seine
-// eigene fixierte Aktionsleiste (REVIEW SCORE/CONFIRM) und darf laut Spec
-// §8/§6.3 keine zusätzliche Navigation zeigen, die vom Loop ablenkt.
+// Bleibt jetzt auf JEDER Seite sichtbar, auch /score — Nutzer sollen nie
+// ohne Navigationsmöglichkeit dastehen. Die eigene Aktionsleiste des
+// RO-Scoring-Loops (REVIEW SCORE/CONFIRM) sitzt dafür auf Mobile über
+// dieser Bar (bottom-16 statt bottom-0, siehe score/page.tsx), statt sie
+// zu verdrängen.
 export function BottomNav() {
   const pathname = usePathname() ?? "/";
-  if (pathname.startsWith("/score")) return null;
 
   return (
     <nav className="fixed inset-x-0 bottom-0 z-40 border-t border-border bg-surface/95 backdrop-blur-sm pb-[env(safe-area-inset-bottom)] md:hidden">
