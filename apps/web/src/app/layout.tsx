@@ -4,6 +4,7 @@ import Link from "next/link";
 import "./globals.css";
 import { TopographyBackground } from "@/components/topography-background";
 import { FortLogo } from "@/components/fort-logo";
+import { BottomNav } from "@/components/bottom-nav";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -41,7 +42,11 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
                 FORT <span className="text-text-muted">Competition</span>
               </span>
             </Link>
-            <div className="flex gap-4 text-sm text-text-muted">
+            {/* Ab md: Textlinks im Header. Darunter übernimmt die BottomNav
+                die Navigation — beides gleichzeitig zu zeigen wäre auf dem
+                Phone redundant (Spec §25: pro Device-Klasse optimieren, nicht
+                nur skalieren). */}
+            <div className="hidden md:flex gap-4 text-sm text-text-muted">
               <Link href="/" className="hover:text-text transition-colors">
                 Matches
               </Link>
@@ -60,7 +65,8 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
             </div>
           </nav>
         </header>
-        <main className="flex-1">{children}</main>
+        <main className="flex-1 pb-20 md:pb-0">{children}</main>
+        <BottomNav />
       </body>
     </html>
   );
