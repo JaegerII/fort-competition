@@ -3,6 +3,13 @@ import { matches } from "@/lib/mock-data";
 import { Badge } from "@/components/badge";
 import { Leaderboard } from "@/components/leaderboard";
 
+// Statischer Export (GitHub Pages) kann nichts on-demand rendern — jede
+// Match-Detailseite muss beim Build bekannt sein.
+export function generateStaticParams() {
+  return matches.map((m) => ({ id: m.id }));
+}
+export const dynamicParams = false;
+
 export default async function MatchPage({
   params,
 }: {
