@@ -54,6 +54,9 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
               <Link href="/score" className="hover:text-text transition-colors">
                 RO-Scoring
               </Link>
+              <Link href="/manage" className="hover:text-text transition-colors">
+                Match Director
+              </Link>
             </div>
           </nav>
         </header>
