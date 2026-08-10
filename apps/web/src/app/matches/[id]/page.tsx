@@ -21,8 +21,8 @@ export default async function MatchPage({
   if (!match) notFound();
 
   return (
-    <div className="max-w-6xl mx-auto px-4 py-10">
-      <div className="mb-8 flex flex-wrap items-start justify-between gap-4">
+    <div className="max-w-6xl mx-auto px-4 py-6 sm:py-10">
+      <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
         <div>
           <div className="mb-2 flex items-center gap-2">
             {match.status === "live" && <Badge tone="live">Live</Badge>}
@@ -46,13 +46,13 @@ export default async function MatchPage({
 
         {match.status !== "completed" &&
           (match.registrationStatus === "closed" ? (
-            <span className="cursor-not-allowed rounded-xl border border-border px-5 py-3 font-medium text-text-faint">
+            <span className="w-full shrink-0 cursor-not-allowed rounded-xl border border-border px-5 py-3 text-center font-medium text-text-faint sm:w-auto">
               Registrierung geschlossen
             </span>
           ) : (
             <Link
               href={`/matches/${match.id}/register`}
-              className="rounded-xl bg-accent px-5 py-3 font-medium text-bg hover:opacity-90 transition-opacity"
+              className="w-full shrink-0 rounded-xl bg-accent px-5 py-3 text-center font-medium text-bg transition-opacity hover:opacity-90 sm:w-auto"
             >
               {match.registrationStatus === "open"
                 ? "Registrieren"

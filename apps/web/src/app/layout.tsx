@@ -5,6 +5,7 @@ import "./globals.css";
 import { TopographyBackground } from "@/components/topography-background";
 import { FortLogo } from "@/components/fort-logo";
 import { BottomNav } from "@/components/bottom-nav";
+import { HamburgerMenu } from "@/components/hamburger-menu";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -54,7 +55,12 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       lang="de"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col bg-bg text-text">
+      {/* min-h-dvh statt min-h-full/h-full-Prozentkette: dvh reagiert live auf
+          das Ein-/Ausblenden der Adressleiste in mobilen Browsern, statt bei
+          jeder Größenänderung des Sichtfensters gegen den zuletzt bekannten
+          %-Wert des Elternelements zu layouten — genau das verursacht das
+          "Footer verrutscht"-Verhalten auf echten Handys. */}
+      <body className="min-h-dvh flex flex-col bg-bg text-text">
         <TopographyBackground />
         <div className="bg-warning-dim border-b border-border text-warning text-xs sm:text-sm px-4 py-2 text-center">
           Prototyp (Phase 6 vorgezogen) — Fake-Daten, kein Backend, keine
@@ -89,9 +95,16 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
                 Match Director
               </Link>
             </div>
+            <HamburgerMenu />
           </nav>
         </header>
-        <main className="flex-1 pb-20 md:pb-0">{children}</main>
+        {/* Padding statt fixem pb-20: env(safe-area-inset-bottom) wächst auf
+            Geräten mit Home-Indicator (die BottomNav bekommt dieselbe
+            Reserve), sonst schneidet die höhere reale Nav-Leiste den
+            letzten sichtbaren Content-Abschnitt an. */}
+        <main className="flex-1 pb-[calc(5rem+env(safe-area-inset-bottom))] md:pb-0">
+          {children}
+        </main>
         <BottomNav />
       </body>
     </html>
