@@ -349,42 +349,51 @@ export default function NewMatchWizardPage() {
                   </p>
                 )}
                 <div className="space-y-2">
+                  {/* flex-col sm:flex-row: Name-Input + Targets/Entfernen sind
+                      zwei eigene Reihen, die auf Mobile untereinander statt
+                      nebeneinander gezwängt werden — als eine Reihe (Nummer +
+                      dehnbares Input + festes Targets-Feld + Label + Button)
+                      lief das rechts aus dem Bildschirm. */}
                   {data.stages.map((s) => (
                     <div
                       key={s.id}
-                      className="flex items-center gap-3 rounded-xl border border-border bg-surface-raised p-3"
+                      className="flex flex-col gap-3 rounded-xl border border-border bg-surface-raised p-3 sm:flex-row sm:items-center"
                     >
-                      <span className="w-8 shrink-0 text-center font-mono text-text-muted">
-                        {s.number}
-                      </span>
-                      <input
-                        className="flex-1 rounded-lg border border-border bg-surface px-3 py-2 focus:border-accent focus:outline-none"
-                        value={s.name}
-                        onChange={(e) =>
-                          updateStage(s.id, { name: e.target.value })
-                        }
-                      />
-                      <input
-                        type="number"
-                        min={1}
-                        className="w-20 rounded-lg border border-border bg-surface px-3 py-2 text-center focus:border-accent focus:outline-none"
-                        value={s.targets}
-                        onChange={(e) =>
-                          updateStage(s.id, {
-                            targets: Number(e.target.value) || 0,
-                          })
-                        }
-                      />
-                      <span className="shrink-0 text-xs text-text-faint">
-                        Targets
-                      </span>
-                      <button
-                        onClick={() => removeStage(s.id)}
-                        className="shrink-0 text-text-faint hover:text-live"
-                        aria-label="Stage entfernen"
-                      >
-                        ✕
-                      </button>
+                      <div className="flex min-w-0 flex-1 items-center gap-3">
+                        <span className="w-8 shrink-0 text-center font-mono text-text-muted">
+                          {s.number}
+                        </span>
+                        <input
+                          className="min-w-0 flex-1 rounded-lg border border-border bg-surface px-3 py-2 focus:border-accent focus:outline-none"
+                          value={s.name}
+                          onChange={(e) =>
+                            updateStage(s.id, { name: e.target.value })
+                          }
+                        />
+                      </div>
+                      <div className="flex shrink-0 items-center gap-3">
+                        <input
+                          type="number"
+                          min={1}
+                          className="w-20 shrink-0 rounded-lg border border-border bg-surface px-3 py-2 text-center focus:border-accent focus:outline-none"
+                          value={s.targets}
+                          onChange={(e) =>
+                            updateStage(s.id, {
+                              targets: Number(e.target.value) || 0,
+                            })
+                          }
+                        />
+                        <span className="shrink-0 text-xs text-text-faint">
+                          Targets
+                        </span>
+                        <button
+                          onClick={() => removeStage(s.id)}
+                          className="shrink-0 text-text-faint hover:text-live"
+                          aria-label="Stage entfernen"
+                        >
+                          ✕
+                        </button>
+                      </div>
                     </div>
                   ))}
                 </div>
@@ -536,13 +545,17 @@ export default function NewMatchWizardPage() {
                   </p>
                 )}
                 <div className="space-y-2">
+                  {/* Gleiches Muster wie bei den Stages: Name-Select bekommt
+                      seine eigene Reihe, Rolle+Entfernen die zweite — das
+                      feste w-44 der Rollen-Auswahl passte auf Mobile nicht
+                      mehr neben ein zusätzliches flex-1 Select. */}
                   {data.officials.map((o) => (
                     <div
                       key={o.id}
-                      className="flex items-center gap-3 rounded-xl border border-border bg-surface-raised p-3"
+                      className="flex flex-col gap-3 rounded-xl border border-border bg-surface-raised p-3 sm:flex-row sm:items-center"
                     >
                       <select
-                        className="flex-1 rounded-lg border border-border bg-surface px-3 py-2 focus:border-accent focus:outline-none"
+                        className="min-w-0 flex-1 rounded-lg border border-border bg-surface px-3 py-2 focus:border-accent focus:outline-none"
                         value={o.name}
                         onChange={(e) =>
                           updateOfficial(o.id, { name: e.target.value })
@@ -554,26 +567,28 @@ export default function NewMatchWizardPage() {
                           </option>
                         ))}
                       </select>
-                      <select
-                        className="w-44 shrink-0 rounded-lg border border-border bg-surface px-3 py-2 focus:border-accent focus:outline-none"
-                        value={o.role}
-                        onChange={(e) =>
-                          updateOfficial(o.id, { role: e.target.value })
-                        }
-                      >
-                        {availableOfficialRoles.map((r) => (
-                          <option key={r} value={r}>
-                            {r}
-                          </option>
-                        ))}
-                      </select>
-                      <button
-                        onClick={() => removeOfficial(o.id)}
-                        className="shrink-0 text-text-faint hover:text-live"
-                        aria-label="Official entfernen"
-                      >
-                        ✕
-                      </button>
+                      <div className="flex shrink-0 items-center gap-3">
+                        <select
+                          className="w-full min-w-0 flex-1 rounded-lg border border-border bg-surface px-3 py-2 focus:border-accent focus:outline-none sm:w-44 sm:flex-none"
+                          value={o.role}
+                          onChange={(e) =>
+                            updateOfficial(o.id, { role: e.target.value })
+                          }
+                        >
+                          {availableOfficialRoles.map((r) => (
+                            <option key={r} value={r}>
+                              {r}
+                            </option>
+                          ))}
+                        </select>
+                        <button
+                          onClick={() => removeOfficial(o.id)}
+                          className="shrink-0 text-text-faint hover:text-live"
+                          aria-label="Official entfernen"
+                        >
+                          ✕
+                        </button>
+                      </div>
                     </div>
                   ))}
                 </div>

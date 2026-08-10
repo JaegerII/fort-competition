@@ -27,20 +27,20 @@ export function Stepper({
         <button
           type="button"
           onClick={() => onChange(Math.max(0, value - 1))}
-          className="flex h-11 w-11 items-center justify-center rounded-lg border border-border bg-surface-raised text-lg font-semibold active:scale-95 transition-transform"
+          className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-border bg-surface-raised text-lg font-semibold active:scale-95 transition-transform"
           aria-label={`${label} verringern`}
         >
           –
         </button>
         <span
-          className={`w-8 text-center font-mono text-lg font-semibold ${valueColor}`}
+          className={`w-7 shrink-0 text-center font-mono text-lg font-semibold ${valueColor}`}
         >
           {value}
         </span>
         <button
           type="button"
           onClick={() => onChange(value + 1)}
-          className="flex h-11 w-11 items-center justify-center rounded-lg border border-border bg-surface-raised text-lg font-semibold active:scale-95 transition-transform"
+          className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-border bg-surface-raised text-lg font-semibold active:scale-95 transition-transform"
           aria-label={`${label} erhöhen`}
         >
           +

@@ -198,7 +198,15 @@ export default function ScorePage() {
               className="rounded-2xl border border-border bg-surface p-4"
             >
               <p className="mb-3 text-sm font-semibold">{t.label}</p>
-              <div className="grid grid-cols-5 gap-2">
+              {/* 5 volle Stepper (je 2 Buttons + Wert, ~116px) passen bei
+                  Handybreite nicht nebeneinander — grid-cols-5 hat das ohne
+                  sichtbares Seiten-Overflow einfach in jeder Spalte
+                  kollidieren lassen (die Spalten selbst schrumpfen ja,
+                  grid-cols-N ist repeat(N, minmax(0,1fr)); der fixbreite
+                  Button/Wert-Inhalt in der Spalte aber nicht). 2 Spalten auf
+                  Mobile geben jedem Stepper genug Platz, ab sm passen alle 5
+                  nebeneinander. */}
+              <div className="grid grid-cols-2 gap-x-3 gap-y-4 sm:grid-cols-5 sm:gap-2">
                 <Stepper
                   label="A"
                   value={targets[t.id].A}

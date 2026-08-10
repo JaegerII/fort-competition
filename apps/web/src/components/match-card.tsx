@@ -21,7 +21,7 @@ export function MatchCard({ match }: { match: MatchSummary }) {
   return (
     <Link
       href={`/matches/${match.id}`}
-      className="block rounded-2xl border border-border bg-surface p-5 transition-colors hover:border-accent/50 hover:bg-surface-raised"
+      className="block min-w-0 rounded-2xl border border-border bg-surface p-5 transition-colors hover:border-accent/50 hover:bg-surface-raised"
     >
       <div className="flex items-start justify-between gap-3">
         <div>
