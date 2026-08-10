@@ -45,7 +45,7 @@ export function MatchCard({ match }: { match: MatchSummary }) {
         </span>
       </div>
 
-      <div className="mt-4 flex items-center justify-between">
+      <div className="mt-4 flex flex-wrap items-center justify-between gap-2">
         <Badge tone={registrationTone[match.registrationStatus]}>
           {registrationLabel[match.registrationStatus]}
         </Badge>
