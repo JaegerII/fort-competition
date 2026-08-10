@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import Link from "next/link";
 import "./globals.css";
@@ -16,10 +16,36 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+// Wie in topography-background.tsx: Next löst `manifest`/`icons` in der
+// Metadata-API NICHT automatisch gegen basePath auf (empirisch geprüft,
+// nicht angenommen — s. Bug/Fix-Historie bei topo-bg.png). Gleicher
+// NEXT_PUBLIC_BASE_PATH-Mechanismus aus next.config.ts wird hier reused.
+const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
+
 export const metadata: Metadata = {
   title: "FORT Competition (Prototyp)",
   description:
     "Klickbarer Prototyp — Match Discovery, Live-Match-Seite, RO-Scoring-Loop. Fake-Daten, kein Backend.",
+  // PWA/Installability — Vorstufe für App-Store-Wrapping (Capacitor o.ä.,
+  // siehe docs/PRODUCT_SPECIFICATION.md §12.1): Home-Screen-Icon, Standalone-
+  // Display, Theme-Farbe.
+  manifest: `${basePath}/manifest.webmanifest`,
+  icons: {
+    icon: [
+      { url: `${basePath}/icons/icon-192.png`, sizes: "192x192", type: "image/png" },
+      { url: `${basePath}/icons/icon-512.png`, sizes: "512x512", type: "image/png" },
+    ],
+    apple: `${basePath}/icons/apple-touch-icon.png`,
+  },
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "black-translucent",
+    title: "FORT Competition",
+  },
+};
+
+export const viewport: Viewport = {
+  themeColor: "#081e24",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
