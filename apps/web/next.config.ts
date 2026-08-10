@@ -9,6 +9,10 @@ const repoName = "fort-competition";
 
 const nextConfig: NextConfig = {
   output: "export",
+  // GitHub Pages löst /pfad/ als /pfad/index.html auf, nicht als /pfad.html —
+  // ohne trailingSlash erzeugt Next flache .html-Dateien, die bei einem
+  // Trailing-Slash-Request (der Normalfall bei Link-Klicks) zu 404 führen.
+  trailingSlash: true,
   images: { unoptimized: true }, // next/image-Optimierungsserver gibt es bei statischem Export nicht
   basePath: isGithubPages ? `/${repoName}` : undefined,
   assetPrefix: isGithubPages ? `/${repoName}/` : undefined,
