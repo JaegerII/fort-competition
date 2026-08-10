@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { divisions, leaderboard, type LeaderboardEntry } from "@/lib/mock-data";
 
 function MovementIndicator({ movement }: { movement: number }) {
@@ -31,7 +32,10 @@ function MobileRow({
   showDivision: boolean;
 }) {
   return (
-    <div className="flex items-center gap-3 border-b border-border bg-surface/40 p-3 last:border-0">
+    <Link
+      href={`/athletes/${entry.athleteId}`}
+      className="flex items-center gap-3 border-b border-border bg-surface/40 p-3 transition-colors last:border-0 hover:bg-surface-raised"
+    >
       <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-surface-raised font-mono text-sm text-text-muted">
         {medal[entry.rank] ?? entry.rank}
       </div>
@@ -50,7 +54,7 @@ function MobileRow({
         </p>
         <MovementIndicator movement={entry.movement} />
       </div>
-    </div>
+    </Link>
   );
 }
 
@@ -111,10 +115,15 @@ export function Leaderboard() {
                   {r.rank}
                 </td>
                 <td className="px-4 py-3 font-medium">
-                  {r.name}{" "}
-                  <span className="text-text-faint text-xs">
-                    {r.country}
-                  </span>
+                  <Link
+                    href={`/athletes/${r.athleteId}`}
+                    className="hover:text-accent transition-colors"
+                  >
+                    {r.name}{" "}
+                    <span className="text-text-faint text-xs">
+                      {r.country}
+                    </span>
+                  </Link>
                 </td>
                 {active === "Overall" && (
                   <td className="px-4 py-3 text-text-muted">

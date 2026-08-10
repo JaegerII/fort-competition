@@ -78,6 +78,7 @@ export const matches: MatchSummary[] = [
 ];
 
 export interface LeaderboardEntry {
+  athleteId: string;
   rank: number;
   name: string;
   country: string;
@@ -92,30 +93,139 @@ export const divisions = ["Overall", "Production Optics", "Standard", "Open"];
 
 export const leaderboard: Record<string, LeaderboardEntry[]> = {
   Overall: [
-    { rank: 1, name: "L. Hoffmann", country: "DE", division: "Production Optics", points: 642.38, percentage: 100.0, hitFactor: 7.9214, movement: 0 },
-    { rank: 2, name: "J. Keller", country: "DE", division: "Open", points: 628.11, percentage: 97.78, hitFactor: 7.7103, movement: 1 },
-    { rank: 3, name: "M. Schneider", country: "AT", division: "Standard", points: 601.54, percentage: 93.64, hitFactor: 7.3820, movement: -1 },
-    { rank: 4, name: "P. Richter", country: "CH", division: "Production Optics", points: 588.02, percentage: 91.53, hitFactor: 7.2189, movement: 2 },
-    { rank: 5, name: "A. Novak", country: "CZ", division: "Open", points: 579.65, percentage: 90.23, hitFactor: 7.1160, movement: 0 },
-    { rank: 6, name: "S. Weber", country: "DE", division: "Production Optics", points: 561.40, percentage: 87.39, hitFactor: 6.8933, movement: -2 },
-    { rank: 7, name: "T. Dubois", country: "FR", division: "Standard", points: 549.87, percentage: 85.60, hitFactor: 6.7515, movement: 0 },
-    { rank: 8, name: "K. Nowak", country: "PL", division: "Open", points: 533.10, percentage: 83.00, hitFactor: 6.5457, movement: 1 },
+    { athleteId: "l-hoffmann", rank: 1, name: "L. Hoffmann", country: "DE", division: "Production Optics", points: 642.38, percentage: 100.0, hitFactor: 7.9214, movement: 0 },
+    { athleteId: "j-keller", rank: 2, name: "J. Keller", country: "DE", division: "Open", points: 628.11, percentage: 97.78, hitFactor: 7.7103, movement: 1 },
+    { athleteId: "m-schneider", rank: 3, name: "M. Schneider", country: "AT", division: "Standard", points: 601.54, percentage: 93.64, hitFactor: 7.3820, movement: -1 },
+    { athleteId: "p-richter", rank: 4, name: "P. Richter", country: "CH", division: "Production Optics", points: 588.02, percentage: 91.53, hitFactor: 7.2189, movement: 2 },
+    { athleteId: "a-novak", rank: 5, name: "A. Novak", country: "CZ", division: "Open", points: 579.65, percentage: 90.23, hitFactor: 7.1160, movement: 0 },
+    { athleteId: "s-weber", rank: 6, name: "S. Weber", country: "DE", division: "Production Optics", points: 561.40, percentage: 87.39, hitFactor: 6.8933, movement: -2 },
+    { athleteId: "t-dubois", rank: 7, name: "T. Dubois", country: "FR", division: "Standard", points: 549.87, percentage: 85.60, hitFactor: 6.7515, movement: 0 },
+    { athleteId: "k-nowak", rank: 8, name: "K. Nowak", country: "PL", division: "Open", points: 533.10, percentage: 83.00, hitFactor: 6.5457, movement: 1 },
   ],
   "Production Optics": [
-    { rank: 1, name: "L. Hoffmann", country: "DE", division: "Production Optics", points: 642.38, percentage: 100.0, hitFactor: 7.9214, movement: 0 },
-    { rank: 2, name: "P. Richter", country: "CH", division: "Production Optics", points: 588.02, percentage: 91.53, hitFactor: 7.2189, movement: 1 },
-    { rank: 3, name: "S. Weber", country: "DE", division: "Production Optics", points: 561.40, percentage: 87.39, hitFactor: 6.8933, movement: -1 },
+    { athleteId: "l-hoffmann", rank: 1, name: "L. Hoffmann", country: "DE", division: "Production Optics", points: 642.38, percentage: 100.0, hitFactor: 7.9214, movement: 0 },
+    { athleteId: "p-richter", rank: 2, name: "P. Richter", country: "CH", division: "Production Optics", points: 588.02, percentage: 91.53, hitFactor: 7.2189, movement: 1 },
+    { athleteId: "s-weber", rank: 3, name: "S. Weber", country: "DE", division: "Production Optics", points: 561.40, percentage: 87.39, hitFactor: 6.8933, movement: -1 },
   ],
   Standard: [
-    { rank: 1, name: "M. Schneider", country: "AT", division: "Standard", points: 601.54, percentage: 100.0, hitFactor: 7.3820, movement: 0 },
-    { rank: 2, name: "T. Dubois", country: "FR", division: "Standard", points: 549.87, percentage: 91.41, hitFactor: 6.7515, movement: 0 },
+    { athleteId: "m-schneider", rank: 1, name: "M. Schneider", country: "AT", division: "Standard", points: 601.54, percentage: 100.0, hitFactor: 7.3820, movement: 0 },
+    { athleteId: "t-dubois", rank: 2, name: "T. Dubois", country: "FR", division: "Standard", points: 549.87, percentage: 91.41, hitFactor: 6.7515, movement: 0 },
   ],
   Open: [
-    { rank: 1, name: "J. Keller", country: "DE", division: "Open", points: 628.11, percentage: 100.0, hitFactor: 7.7103, movement: 0 },
-    { rank: 2, name: "A. Novak", country: "CZ", division: "Open", points: 579.65, percentage: 92.29, hitFactor: 7.1160, movement: 1 },
-    { rank: 3, name: "K. Nowak", country: "PL", division: "Open", points: 533.10, percentage: 84.87, hitFactor: 6.5457, movement: -1 },
+    { athleteId: "j-keller", rank: 1, name: "J. Keller", country: "DE", division: "Open", points: 628.11, percentage: 100.0, hitFactor: 7.7103, movement: 0 },
+    { athleteId: "a-novak", rank: 2, name: "A. Novak", country: "CZ", division: "Open", points: 579.65, percentage: 92.29, hitFactor: 7.1160, movement: 1 },
+    { athleteId: "k-nowak", rank: 3, name: "K. Nowak", country: "PL", division: "Open", points: 533.10, percentage: 84.87, hitFactor: 6.5457, movement: -1 },
   ],
 };
+
+export interface AthleteHistoryEntry {
+  matchName: string;
+  date: string;
+  place: string;
+  matchPct: number;
+}
+
+export interface AthleteProfile {
+  id: string;
+  fullName: string;
+  country: string;
+  primaryDivision: string;
+  matches: number;
+  stages: number;
+  podiums: number;
+  wins: number;
+  avgMatchPct: number;
+  avgStagePct: number;
+  avgHitFactor: number;
+  aZonePct: number;
+  penaltyRate: number;
+  dnfRate: number;
+  insight: string | null;
+  history: AthleteHistoryEntry[];
+}
+
+// Ein vollständig ausgearbeitetes Profil (Lena Hoffmann, die wiederkehrende
+// Beispiel-Athletin aus RO-Scoring/Leaderboard) plus schlanker generierte
+// Profile für den Rest der Rangliste — genug, damit jeder Leaderboard-Link
+// auf eine echte Seite führt, ohne 8× denselben Detailgrad von Hand zu
+// pflegen. "insight" ist nur bei Lena gesetzt: Spec §13 verlangt, dass jeder
+// Insight aus echten Wettkampfdaten abgeleitet ist, nicht erfunden — für die
+// Nebenrollen ohne ausgearbeitete Historie lassen wir ihn bewusst weg statt
+// einen Fake-Text zu zeigen.
+export const athleteProfiles: Record<string, AthleteProfile> = {
+  "l-hoffmann": {
+    id: "l-hoffmann",
+    fullName: "Lena Hoffmann",
+    country: "Deutschland",
+    primaryDivision: "Production Optics",
+    matches: 34,
+    stages: 287,
+    podiums: 6,
+    wins: 2,
+    avgMatchPct: 91.4,
+    avgStagePct: 88.9,
+    avgHitFactor: 7.42,
+    aZonePct: 82.3,
+    penaltyRate: 3.1,
+    dnfRate: 0,
+    insight:
+      "Deine Stage-Prozente auf kurzen, transitionslastigen Stages liegen im Schnitt 6.2 Prozentpunkte unter deinem Match-Durchschnitt.",
+    history: [
+      { matchName: "IPSC Saarland Open 2027", date: "18.–19. April 2027", place: "#1 Production Optics", matchPct: 100.0 },
+      { matchName: "Rheinland-Pfalz Cup 2026", date: "5.–6. Juli 2026", place: "#2 Overall", matchPct: 96.4 },
+      { matchName: "Dudweiler Feierabendmatch #12", date: "14. März 2026", place: "#1 Overall", matchPct: 100.0 },
+      { matchName: "IPSC Saarland Open 2026", date: "12.–13. April 2026", place: "#4 Production Optics", matchPct: 89.1 },
+      { matchName: "Winter Classic 2025", date: "8. Dezember 2025", place: "#3 Overall", matchPct: 92.7 },
+    ],
+  },
+};
+
+const secondaryAthletes: { id: string; fullName: string; entry: LeaderboardEntry }[] = [
+  { id: "j-keller", fullName: "Jonas Keller", entry: leaderboard.Overall[1] },
+  { id: "m-schneider", fullName: "Mia Schneider", entry: leaderboard.Overall[2] },
+  { id: "p-richter", fullName: "Paul Richter", entry: leaderboard.Overall[3] },
+  { id: "a-novak", fullName: "Anna Novak", entry: leaderboard.Overall[4] },
+  { id: "s-weber", fullName: "Sven Weber", entry: leaderboard.Overall[5] },
+  { id: "t-dubois", fullName: "Tomas Dubois", entry: leaderboard.Overall[6] },
+  { id: "k-nowak", fullName: "Karol Nowak", entry: leaderboard.Overall[7] },
+];
+
+const countryNames: Record<string, string> = {
+  DE: "Deutschland",
+  AT: "Österreich",
+  CH: "Schweiz",
+  CZ: "Tschechien",
+  FR: "Frankreich",
+  PL: "Polen",
+};
+
+for (const a of secondaryAthletes) {
+  athleteProfiles[a.id] = {
+    id: a.id,
+    fullName: a.fullName,
+    country: countryNames[a.entry.country] ?? a.entry.country,
+    primaryDivision: a.entry.division,
+    matches: 12 + Math.round(a.entry.percentage / 5),
+    stages: (12 + Math.round(a.entry.percentage / 5)) * 8,
+    podiums: Math.max(0, Math.round((100 - a.entry.rank * 8) / 20)),
+    wins: a.entry.rank === 1 ? 1 : 0,
+    avgMatchPct: Math.round((a.entry.percentage - 4) * 10) / 10,
+    avgStagePct: Math.round((a.entry.percentage - 6.5) * 10) / 10,
+    avgHitFactor: Math.round((a.entry.hitFactor - 0.3) * 100) / 100,
+    aZonePct: Math.round((a.entry.percentage - 12) * 10) / 10,
+    penaltyRate: Math.round((5 + a.entry.rank * 0.4) * 10) / 10,
+    dnfRate: 0,
+    insight: null,
+    history: [
+      {
+        matchName: "IPSC Saarland Open 2027",
+        date: "18.–19. April 2027",
+        place: `#${a.entry.rank} ${a.entry.division}`,
+        matchPct: a.entry.percentage,
+      },
+    ],
+  };
+}
 
 export interface ScoringTarget {
   id: string;
