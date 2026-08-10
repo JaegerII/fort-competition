@@ -147,6 +147,26 @@ export const scoringStage = {
   ] as ScoringTarget[],
 };
 
+export interface RegistrationSquad {
+  id: string;
+  name: string;
+  timeSlot: string;
+  capacity: number;
+  filled: number;
+}
+
+// Squads zur Auswahl im Registrierungs-Flow — pro Match, unabhängig von den
+// scoringSquads oben (die sind für die RO-Scoring-Demo an Stage 04 gebunden).
+// Squad 1 ist bewusst voll, um den "Squad voll → Warteliste"-Fall aus den
+// Phase-2-Flows zu demonstrieren.
+export const registrationSquads: Record<string, RegistrationSquad[]> = {
+  "dudweiler-feierabendmatch-14": [
+    { id: "reg-sq-1", name: "Squad 1", timeSlot: "12.09. 17:00", capacity: 10, filled: 10 },
+    { id: "reg-sq-2", name: "Squad 2", timeSlot: "12.09. 18:00", capacity: 10, filled: 6 },
+    { id: "reg-sq-3", name: "Squad 3", timeSlot: "12.09. 19:00", capacity: 10, filled: 3 },
+  ],
+};
+
 export const scoringSquads: ScoringSquad[] = [
   {
     id: "squad-3",

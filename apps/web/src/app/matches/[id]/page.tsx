@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import Link from "next/link";
 import { matches } from "@/lib/mock-data";
 import { Badge } from "@/components/badge";
 import { Leaderboard } from "@/components/leaderboard";
@@ -43,15 +44,21 @@ export default async function MatchPage({
           </p>
         </div>
 
-        {match.status !== "completed" && (
-          <button className="rounded-xl bg-accent px-5 py-3 font-medium text-bg hover:opacity-90 transition-opacity">
-            {match.registrationStatus === "open"
-              ? "Registrieren"
-              : match.registrationStatus === "waitlist"
-                ? "Auf Warteliste setzen"
-                : "Registrierung geschlossen"}
-          </button>
-        )}
+        {match.status !== "completed" &&
+          (match.registrationStatus === "closed" ? (
+            <span className="cursor-not-allowed rounded-xl border border-border px-5 py-3 font-medium text-text-faint">
+              Registrierung geschlossen
+            </span>
+          ) : (
+            <Link
+              href={`/matches/${match.id}/register`}
+              className="rounded-xl bg-accent px-5 py-3 font-medium text-bg hover:opacity-90 transition-opacity"
+            >
+              {match.registrationStatus === "open"
+                ? "Registrieren"
+                : "Auf Warteliste setzen"}
+            </Link>
+          ))}
       </div>
 
       {match.status === "live" && (
