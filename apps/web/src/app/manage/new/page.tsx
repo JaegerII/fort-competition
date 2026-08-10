@@ -137,8 +137,11 @@ export default function NewMatchWizardPage() {
         nicht-linear zwischen Schritten springen.
       </p>
 
-      <div className="grid gap-8 lg:grid-cols-[220px_1fr]">
-        <nav className="flex gap-2 overflow-x-auto lg:flex-col lg:overflow-visible">
+      {/* min-w-0 s. Kommentar in matches/[id]/page.tsx — sonst blähen die
+          Review-Step dt/dd-Zeilen (z.B. "Squad · 12 × 15 Plätze") die
+          Content-Spalte über den Viewport hinaus auf. */}
+      <div className="grid grid-cols-1 gap-8 lg:grid-cols-[220px_1fr]">
+        <nav className="flex min-w-0 gap-2 overflow-x-auto lg:flex-col lg:overflow-visible">
           {wizardSteps.map((s, i) => {
             const isActive = s.id === step;
             const isDone = i < stepIndex;
@@ -169,7 +172,7 @@ export default function NewMatchWizardPage() {
           })}
         </nav>
 
-        <div>
+        <div className="min-w-0">
           <div className="rounded-2xl border border-border bg-surface p-6 min-h-[420px]">
             {step === "ruleset" && (
               <div>

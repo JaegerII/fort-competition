@@ -80,8 +80,13 @@ export default async function MatchPage({
         </div>
       )}
 
-      <div className="grid gap-8 lg:grid-cols-[1fr_300px]">
-        <div className="order-2 lg:order-none">
+      {/* min-w-0 auf beiden Grid-Kindern ist Pflicht, nicht Kosmetik: Grid-Items
+          haben implizit min-width:auto und lassen sich sonst nicht unter ihre
+          eigene Content-Breite schrumpfen — eine einzelne unwrapped Zeile wie
+          "#14 / 127" bläht dann die ganze Spalte (und damit die Seite) über
+          den Viewport hinaus auf, statt normal umzubrechen. */}
+      <div className="grid grid-cols-1 gap-8 lg:grid-cols-[1fr_300px]">
+        <div className="order-2 min-w-0 lg:order-none">
           <h2 className="mb-4 text-lg font-semibold">Rangliste</h2>
           <Leaderboard />
         </div>
@@ -89,7 +94,7 @@ export default async function MatchPage({
         {/* Auf Mobile vor die Rangliste — das eigene Ergebnis ist die
             persönlich relevanteste Info und soll nicht erst nach Scrollen
             durch eine potenziell lange Liste sichtbar werden. */}
-        <aside className="order-1 h-fit rounded-2xl border border-border bg-surface p-5 lg:order-none">
+        <aside className="order-1 h-fit min-w-0 rounded-2xl border border-border bg-surface p-5 lg:order-none">
           <h2 className="mb-4 text-sm font-semibold uppercase tracking-wide text-text-muted">
             Dein Match
           </h2>
