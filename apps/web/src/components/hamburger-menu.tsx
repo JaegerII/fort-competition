@@ -2,15 +2,16 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Menu, X, Settings, UserCircle } from "lucide-react";
+import { Menu, X, Settings, UserCircle, LogOut } from "lucide-react";
+import { useAuth } from "@/contexts/auth-context";
 
 // Persistenter Einstiegspunkt für Settings/Account — bewusst getrennt von
 // der primären Navigation (Header-Links/BottomNav), weil "Einstellungen"
 // und "Account" keine der vier Kernrollen-Flows sind, sondern App-weite
-// Verwaltung. Account ist als Platzhalter markiert, bis FORT Athlete
-// (Spec §29, gemeinsame Identität mit FORT Performance) angebunden ist.
+// Verwaltung.
 export function HamburgerMenu() {
   const [open, setOpen] = useState(false);
+  const { user, logout } = useAuth();
 
   return (
     <div className="relative ml-auto">
@@ -29,7 +30,7 @@ export function HamburgerMenu() {
             onClick={() => setOpen(false)}
             aria-hidden="true"
           />
-          <div className="absolute right-0 top-full z-50 mt-2 w-56 overflow-hidden rounded-2xl border border-border bg-surface shadow-xl">
+          <div className="absolute right-0 top-full z-50 mt-2 w-60 overflow-hidden rounded-2xl border border-border bg-surface shadow-xl">
             <Link
               href="/settings"
               onClick={() => setOpen(false)}
@@ -38,15 +39,39 @@ export function HamburgerMenu() {
               <Settings size={18} className="text-text-muted" />
               Einstellungen
             </Link>
-            <div className="flex items-center justify-between gap-3 px-4 py-3.5 text-sm text-text-faint">
-              <span className="flex items-center gap-3">
-                <UserCircle size={18} />
-                Account
-              </span>
-              <span className="rounded-full bg-surface-raised px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide">
-                Bald
-              </span>
-            </div>
+
+            {user ? (
+              <>
+                <div className="flex items-center gap-3 border-t border-border px-4 py-3.5 text-sm">
+                  <UserCircle size={18} className="text-accent" />
+                  <div className="min-w-0">
+                    <p className="truncate font-medium">{user.name}</p>
+                    <p className="truncate text-xs text-text-faint">
+                      {user.email}
+                    </p>
+                  </div>
+                </div>
+                <button
+                  onClick={() => {
+                    logout();
+                    setOpen(false);
+                  }}
+                  className="flex w-full items-center gap-3 border-t border-border px-4 py-3.5 text-left text-sm text-text-muted transition-colors hover:bg-surface-raised hover:text-live"
+                >
+                  <LogOut size={18} />
+                  Abmelden
+                </button>
+              </>
+            ) : (
+              <Link
+                href="/login"
+                onClick={() => setOpen(false)}
+                className="flex items-center gap-3 border-t border-border px-4 py-3.5 text-sm transition-colors hover:bg-surface-raised"
+              >
+                <UserCircle size={18} className="text-text-muted" />
+                Anmelden
+              </Link>
+            )}
           </div>
         </>
       )}

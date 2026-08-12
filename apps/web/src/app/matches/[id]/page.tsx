@@ -1,8 +1,8 @@
 import { notFound } from "next/navigation";
-import Link from "next/link";
 import { matches } from "@/lib/mock-data";
 import { Badge } from "@/components/badge";
 import { Leaderboard } from "@/components/leaderboard";
+import { RegisterCta } from "@/components/register-cta";
 
 // Statischer Export (GitHub Pages) kann nichts on-demand rendern — jede
 // Match-Detailseite muss beim Build bekannt sein.
@@ -50,14 +50,10 @@ export default async function MatchPage({
               Registrierung geschlossen
             </span>
           ) : (
-            <Link
-              href={`/matches/${match.id}/register`}
-              className="w-full shrink-0 rounded-xl bg-accent px-5 py-3 text-center font-medium text-bg transition-opacity hover:opacity-90 sm:w-auto"
-            >
-              {match.registrationStatus === "open"
-                ? "Registrieren"
-                : "Auf Warteliste setzen"}
-            </Link>
+            <RegisterCta
+              matchId={match.id}
+              registrationStatus={match.registrationStatus}
+            />
           ))}
       </div>
 

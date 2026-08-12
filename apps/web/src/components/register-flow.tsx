@@ -2,14 +2,18 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import type { MatchSummary, RegistrationSquad } from "@/lib/mock-data";
 import { registrationSquads } from "@/lib/mock-data";
 import { availableCategories, availableDivisions } from "@/lib/wizard-data";
 import { Chip } from "@/components/chip";
+import { useAuth } from "@/contexts/auth-context";
 
 type Step = "selection" | "squad" | "payment";
 
 export function RegisterFlow({ match }: { match: MatchSummary }) {
+  const { user } = useAuth();
+  const pathname = usePathname();
   const [step, setStep] = useState<Step>("selection");
   const [division, setDivision] = useState<string | null>(null);
   const [categories, setCategories] = useState<string[]>([]);
@@ -29,6 +33,26 @@ export function RegisterFlow({ match }: { match: MatchSummary }) {
     setSquad(s);
     setWaitlisted(s.filled >= s.capacity);
     setStep("payment");
+  }
+
+  // Zweite Absicherung neben der CTA auf der Match-Seite (register-cta.tsx)
+  // — falls jemand direkt auf /matches/[id]/register navigiert (Bookmark,
+  // Zurück-Button), ohne über den Button gegangen zu sein.
+  if (!user) {
+    return (
+      <div className="max-w-sm mx-auto px-4 py-20 text-center">
+        <h1 className="text-xl font-semibold">Anmeldung erforderlich</h1>
+        <p className="mt-2 text-sm text-text-muted">
+          Melde dich an, um dich für {match.name} zu registrieren.
+        </p>
+        <Link
+          href={`/login?returnTo=${encodeURIComponent(pathname ?? "")}`}
+          className="mt-6 inline-block rounded-xl bg-accent px-5 py-3 font-medium text-bg hover:opacity-90 transition-opacity"
+        >
+          Zum Login
+        </Link>
+      </div>
+    );
   }
 
   if (confirmed) {
