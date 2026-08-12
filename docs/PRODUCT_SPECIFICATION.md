@@ -174,6 +174,21 @@ Refining brief §26 into three concrete tranches. Rule of thumb used: **MVP = th
 - Range/stage maps and in-venue navigation
 - Federation-level certification/compliance features
 - Public API for third-party stats tools
+- External match/result data import (adapter layer, never driving the core
+  model directly), external competition identities (IPSC/PractiScore/USPSA
+  IDs), unclaimed/external shooter profiles with a later "claim this
+  profile" flow, external-vs-FORT-managed match distinction, duplicate
+  detection/identity resolution across sources, and data provenance
+  tracking on any imported record — see
+  [ROADMAP_EXTENSIONS.md](./ROADMAP_EXTENSIONS.md) for the full reconciliation
+  against the current spec/schema/codebase, including the one point
+  (athlete profile vs. user account decoupling) worth a second look before
+  Phase 4's real schema lands, not just left for later
+- Richer athlete-following feed (match updates, live performance, new PR,
+  podium, ranking change) — enrichment of the "follow" item already above,
+  not a separate feature
+- FORT-native performance rating (explicitly not an official federation
+  ranking) — see ROADMAP_EXTENSIONS.md §9 for inputs it would plausibly need
 
 ---
 
