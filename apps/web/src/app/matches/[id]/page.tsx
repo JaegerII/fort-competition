@@ -3,6 +3,7 @@ import { matches } from "@/lib/mock-data";
 import { Badge } from "@/components/badge";
 import { Leaderboard } from "@/components/leaderboard";
 import { RegisterCta } from "@/components/register-cta";
+import { PersonalMatchCard } from "@/components/personal-match-card";
 
 // Statischer Export (GitHub Pages) kann nichts on-demand rendern — jede
 // Match-Detailseite muss beim Build bekannt sein.
@@ -90,48 +91,7 @@ export default async function MatchPage({
         {/* Auf Mobile vor die Rangliste — das eigene Ergebnis ist die
             persönlich relevanteste Info und soll nicht erst nach Scrollen
             durch eine potenziell lange Liste sichtbar werden. */}
-        <aside className="order-1 h-fit min-w-0 rounded-2xl border border-border bg-surface p-5 lg:order-none">
-          <h2 className="mb-4 text-sm font-semibold uppercase tracking-wide text-text-muted">
-            Dein Match
-          </h2>
-          <dl className="space-y-4">
-            <div className="flex items-baseline justify-between">
-              <dt className="text-sm text-text-muted">Overall</dt>
-              <dd className="font-mono text-lg">
-                #14{" "}
-                <span className="text-text-faint text-sm">/ 127</span>
-              </dd>
-            </div>
-            <div className="flex items-baseline justify-between">
-              <dt className="text-sm text-text-muted">Division</dt>
-              <dd className="font-mono text-lg">
-                #3 <span className="text-text-faint text-sm">/ 38</span>
-              </dd>
-            </div>
-            <div className="flex items-baseline justify-between">
-              <dt className="text-sm text-text-muted">Match %</dt>
-              <dd className="font-mono text-lg text-accent">91.27%</dd>
-            </div>
-            <div className="flex items-baseline justify-between">
-              <dt className="text-sm text-text-muted">Stages</dt>
-              <dd className="font-mono text-lg">8 / 12</dd>
-            </div>
-            <div className="border-t border-border pt-4">
-              <div className="flex items-baseline justify-between">
-                <dt className="text-sm text-text-muted">Letzte Stage</dt>
-                <dd className="text-sm">Stage 8 · Rang #4</dd>
-              </div>
-              <div className="mt-1 flex items-baseline justify-between">
-                <dt className="text-sm text-text-muted">Bewegung</dt>
-                <dd className="text-sm text-accent">↑ 2 Plätze</dd>
-              </div>
-            </div>
-          </dl>
-          <p className="mt-4 text-xs text-text-faint">
-            Beispielhaft für einen eingeloggten Athleten — echte Daten folgen
-            in Phase 7.
-          </p>
-        </aside>
+        <PersonalMatchCard />
       </div>
     </div>
   );
