@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Menu, X, Settings, UserCircle, LogOut, Trophy } from "lucide-react";
+import { Menu, X, Settings, UserCircle, LogOut, Trophy, Search } from "lucide-react";
 import { useAuth } from "@/contexts/auth-context";
 
 // Persistenter Einstiegspunkt für Settings/Account — bewusst getrennt von
@@ -32,9 +32,17 @@ export function HamburgerMenu() {
           />
           <div className="absolute right-0 top-full z-50 mt-2 w-60 overflow-hidden rounded-2xl border border-border bg-surface shadow-xl">
             <Link
-              href="/settings"
+              href="/athletes"
               onClick={() => setOpen(false)}
               className="flex items-center gap-3 px-4 py-3.5 text-sm transition-colors hover:bg-surface-raised"
+            >
+              <Search size={18} className="text-text-muted" />
+              Athleten suchen
+            </Link>
+            <Link
+              href="/settings"
+              onClick={() => setOpen(false)}
+              className="flex items-center gap-3 border-t border-border px-4 py-3.5 text-sm transition-colors hover:bg-surface-raised"
             >
               <Settings size={18} className="text-text-muted" />
               Einstellungen
