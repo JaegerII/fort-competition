@@ -126,6 +126,8 @@ export default function ScorePage() {
 
   // ── Shooter-Queue ──────────────────────────────────────────────
   if (mode === "queue") {
+    const doneCount = squad.shooters.filter((s) => doneIds.has(s.id)).length;
+    const squadComplete = doneCount === squad.shooters.length;
     return (
       <div className="max-w-2xl mx-auto px-4 py-10">
         <button
@@ -136,6 +138,30 @@ export default function ScorePage() {
         </button>
         <h1 className="mb-1 text-2xl font-semibold">{squad.name}</h1>
         <p className="mb-6 text-text-muted">{scoringStage.name}</p>
+
+        {squadComplete && (
+          <div className="mb-6 flex flex-col gap-4 rounded-2xl border border-accent/30 bg-accent-dim p-5 sm:flex-row sm:items-center">
+            <div className="flex items-center gap-4">
+              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-accent text-lg text-bg">
+                ✓
+              </div>
+              <div className="min-w-0 flex-1">
+                <p className="font-semibold text-accent">Squad abgeschlossen</p>
+                <p className="text-sm text-text-muted">
+                  Alle {squad.shooters.length} Schützen erfasst — {scoringStage.name}
+                  .
+                </p>
+              </div>
+            </div>
+            <button
+              onClick={() => setSquadId(null)}
+              className="shrink-0 rounded-lg border border-accent/50 px-3 py-2 text-sm text-accent hover:bg-accent/10 transition-colors sm:ml-auto"
+            >
+              Nächste Squad
+            </button>
+          </div>
+        )}
+
         <div className="space-y-3">
           {squad.shooters.map((s) => {
             const done = doneIds.has(s.id);
