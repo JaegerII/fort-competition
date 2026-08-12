@@ -29,6 +29,7 @@ export interface Registration {
 interface RegistrationsContextValue {
   registrations: Registration[];
   registerFor: (reg: Omit<Registration, "registeredAt">) => void;
+  cancelRegistration: (matchId: string) => void;
   isRegistered: (matchId: string) => Registration | undefined;
 }
 
@@ -65,6 +66,14 @@ export function RegistrationsProvider({ children }: { children: ReactNode }) {
     });
   }
 
+  function cancelRegistration(matchId: string) {
+    setRegistrations((prev) => {
+      const next = prev.filter((r) => r.matchId !== matchId);
+      window.localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
+      return next;
+    });
+  }
+
   function isRegistered(matchId: string) {
     return registrations.find((r) => r.matchId === matchId);
   }
@@ -72,7 +81,12 @@ export function RegistrationsProvider({ children }: { children: ReactNode }) {
   if (!hydrated) {
     return (
       <RegistrationsContext.Provider
-        value={{ registrations: [], registerFor, isRegistered: () => undefined }}
+        value={{
+          registrations: [],
+          registerFor,
+          cancelRegistration,
+          isRegistered: () => undefined,
+        }}
       >
         {children}
       </RegistrationsContext.Provider>
@@ -81,7 +95,7 @@ export function RegistrationsProvider({ children }: { children: ReactNode }) {
 
   return (
     <RegistrationsContext.Provider
-      value={{ registrations, registerFor, isRegistered }}
+      value={{ registrations, registerFor, cancelRegistration, isRegistered }}
     >
       {children}
     </RegistrationsContext.Provider>

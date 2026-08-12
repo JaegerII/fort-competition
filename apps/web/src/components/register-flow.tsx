@@ -14,7 +14,8 @@ type Step = "selection" | "squad" | "payment";
 
 export function RegisterFlow({ match }: { match: MatchSummary }) {
   const { user } = useAuth();
-  const { registerFor, isRegistered } = useRegistrations();
+  const { registerFor, cancelRegistration, isRegistered } =
+    useRegistrations();
   const pathname = usePathname();
   const [step, setStep] = useState<Step>("selection");
   const [division, setDivision] = useState<string | null>(null);
@@ -22,6 +23,7 @@ export function RegisterFlow({ match }: { match: MatchSummary }) {
   const [squad, setSquad] = useState<RegistrationSquad | null>(null);
   const [waitlisted, setWaitlisted] = useState(false);
   const [confirmed, setConfirmed] = useState(false);
+  const [confirmingCancel, setConfirmingCancel] = useState(false);
 
   const squads = registrationSquads[match.id] ?? [];
 
@@ -58,6 +60,13 @@ export function RegisterFlow({ match }: { match: MatchSummary }) {
   }
 
   const existing = isRegistered(match.id);
+
+  function handleCancel() {
+    cancelRegistration(match.id);
+    setConfirmed(false);
+    setConfirmingCancel(false);
+    setStep("selection");
+  }
 
   if (confirmed || (existing && !confirmed && step === "selection")) {
     const w = confirmed ? waitlisted : existing?.status === "waitlisted";
@@ -102,6 +111,38 @@ export function RegisterFlow({ match }: { match: MatchSummary }) {
         >
           Zur Match-Seite
         </Link>
+
+        <div className="mt-8 border-t border-border pt-6">
+          {confirmingCancel ? (
+            <div className="mx-auto max-w-xs">
+              <p className="mb-3 text-sm text-text-muted">
+                Registrierung wirklich stornieren? Dein Platz
+                {sq ? ` in ${sq.name}` : ""} wird freigegeben.
+              </p>
+              <div className="flex justify-center gap-2">
+                <button
+                  onClick={handleCancel}
+                  className="rounded-lg bg-live px-3 py-2 text-sm font-medium text-white hover:opacity-90 transition-opacity"
+                >
+                  Wirklich stornieren
+                </button>
+                <button
+                  onClick={() => setConfirmingCancel(false)}
+                  className="rounded-lg border border-border px-3 py-2 text-sm hover:bg-surface-raised transition-colors"
+                >
+                  Abbrechen
+                </button>
+              </div>
+            </div>
+          ) : (
+            <button
+              onClick={() => setConfirmingCancel(true)}
+              className="text-sm text-text-muted hover:text-live transition-colors"
+            >
+              Registrierung stornieren
+            </button>
+          )}
+        </div>
       </div>
     );
   }
