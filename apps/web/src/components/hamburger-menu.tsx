@@ -50,7 +50,11 @@ export function HamburgerMenu() {
                   <Trophy size={18} className="text-text-muted" />
                   Meine Matches
                 </Link>
-                <div className="flex items-center gap-3 border-t border-border px-4 py-3.5 text-sm">
+                <Link
+                  href="/profile"
+                  onClick={() => setOpen(false)}
+                  className="flex items-center gap-3 border-t border-border px-4 py-3.5 text-sm transition-colors hover:bg-surface-raised"
+                >
                   <UserCircle size={18} className="text-accent" />
                   <div className="min-w-0">
                     <p className="truncate font-medium">{user.name}</p>
@@ -58,7 +62,7 @@ export function HamburgerMenu() {
                       {user.email}
                     </p>
                   </div>
-                </div>
+                </Link>
                 <button
                   onClick={() => {
                     logout();
