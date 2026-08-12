@@ -44,6 +44,23 @@ export default function NewMatchWizardPage() {
   const stepIndex = wizardSteps.findIndex((s) => s.id === step);
   const canGoNext = stepIndex < wizardSteps.length - 1;
   const canGoBack = stepIndex > 0;
+  // "Weiter" blockiert bei fehlenden Pflichtangaben — vorher konnte man
+  // ohne Ruleset oder Match-Namen bis zum Review durchklicken (die
+  // Step-Sidebar links erlaubt weiterhin freies, nicht-lineares Springen,
+  // das bleibt bewusst so; nur der lineare "Weiter"-Pfad validiert).
+  // Divisionen/Kategorien/Stages/Registrierung/Squads/Officials bleiben
+  // absichtlich optional, gleiches Prinzip wie bei den Kategorien im
+  // Athleten-Registrierungs-Flow.
+  const canProceed =
+    step === "ruleset"
+      ? data.ruleset !== null
+      : step === "info"
+        ? data.info.name.trim() !== ""
+        : true;
+  // Sidebar-Navigation erlaubt weiterhin freies Springen zum Review-Schritt
+  // ohne die lineare "Weiter"-Prüfung zu durchlaufen — PUBLISH braucht
+  // deshalb seine eigene, unabhängige Prüfung derselben Pflichtfelder.
+  const canPublish = data.ruleset !== null && data.info.name.trim() !== "";
 
   function update<K extends keyof WizardState>(key: K, value: WizardState[K]) {
     setData((d) => ({ ...d, [key]: value }));
@@ -650,12 +667,21 @@ export default function NewMatchWizardPage() {
                   </Row>
                 </dl>
 
-                <button
-                  onClick={() => setPublished(true)}
-                  className="mt-8 w-full rounded-xl bg-accent py-4 text-lg font-semibold text-bg hover:opacity-90 transition-opacity"
-                >
-                  PUBLISH
-                </button>
+                <div className="mt-8">
+                  {!canPublish && (
+                    <p className="mb-3 text-sm text-warning">
+                      Ruleset und Match-Name sind Pflichtfelder — bitte vor
+                      dem Veröffentlichen ergänzen.
+                    </p>
+                  )}
+                  <button
+                    disabled={!canPublish}
+                    onClick={() => setPublished(true)}
+                    className="w-full rounded-xl bg-accent py-4 text-lg font-semibold text-bg hover:opacity-90 transition-opacity disabled:opacity-30 disabled:pointer-events-none"
+                  >
+                    PUBLISH
+                  </button>
+                </div>
               </div>
             )}
           </div>
@@ -670,8 +696,9 @@ export default function NewMatchWizardPage() {
             </button>
             {canGoNext && (
               <button
+                disabled={!canProceed}
                 onClick={() => setStep(wizardSteps[stepIndex + 1].id)}
-                className="rounded-xl bg-accent px-5 py-2.5 text-sm font-medium text-bg hover:opacity-90 transition-opacity"
+                className="rounded-xl bg-accent px-5 py-2.5 text-sm font-medium text-bg hover:opacity-90 transition-opacity disabled:opacity-30 disabled:pointer-events-none"
               >
                 Weiter →
               </button>
