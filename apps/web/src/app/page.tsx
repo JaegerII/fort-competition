@@ -1,10 +1,16 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { matches } from "@/lib/mock-data";
+import { matches, type MatchStatus } from "@/lib/mock-data";
 import { MatchCard } from "@/components/match-card";
 
 const ALL = "Alle";
+
+const statusLabel: Record<MatchStatus, string> = {
+  live: "Live",
+  upcoming: "Bevorstehend",
+  completed: "Beendet",
+};
 
 function FilterSelect({
   label,
@@ -42,6 +48,7 @@ export default function DiscoverPage() {
   const [country, setCountry] = useState(ALL);
   const [discipline, setDiscipline] = useState(ALL);
   const [level, setLevel] = useState(ALL);
+  const [timeframe, setTimeframe] = useState(ALL);
   const [openOnly, setOpenOnly] = useState(false);
 
   const countries = useMemo(
@@ -56,11 +63,22 @@ export default function DiscoverPage() {
     () => Array.from(new Set(matches.map((m) => m.level))),
     [],
   );
+  // Nur Status vertreten, die tatsächlich in den Daten vorkommen — sonst
+  // könnte man z.B. "Beendet" wählen, obwohl es aktuell kein einziges
+  // beendetes Match gibt.
+  const timeframes = useMemo(
+    () =>
+      Array.from(new Set(matches.map((m) => m.status))).map(
+        (s) => statusLabel[s],
+      ),
+    [],
+  );
 
   const filtered = matches.filter((m) => {
     if (country !== ALL && m.country !== country) return false;
     if (discipline !== ALL && m.discipline !== discipline) return false;
     if (level !== ALL && m.level !== level) return false;
+    if (timeframe !== ALL && statusLabel[m.status] !== timeframe) return false;
     if (openOnly && m.registrationStatus !== "open") return false;
     return true;
   });
@@ -69,6 +87,7 @@ export default function DiscoverPage() {
     (country !== ALL ? 1 : 0) +
     (discipline !== ALL ? 1 : 0) +
     (level !== ALL ? 1 : 0) +
+    (timeframe !== ALL ? 1 : 0) +
     (openOnly ? 1 : 0);
 
   return (
@@ -112,17 +131,16 @@ export default function DiscoverPage() {
         >
           Registrierung offen
         </button>
-        {/* Datum/Distanz brauchen einen echten Datepicker bzw. Browser-
-            Geolocation — bei 3 Mock-Matches (alle in Deutschland, alle
-            unterschiedliche Zeiträume) bringt eine vorgetäuschte Umsetzung
-            keinen echten Mehrwert. Klar als "bald" markiert statt eine
-            Funktion vorzutäuschen, die nichts tut. */}
-        <span
-          title="Bald verfügbar"
-          className="cursor-not-allowed rounded-full border border-border px-4 py-2 text-sm text-text-faint"
-        >
-          Datum · Bald
-        </span>
+        <FilterSelect
+          label="Zeitraum"
+          value={timeframe}
+          options={timeframes}
+          onChange={setTimeframe}
+        />
+        {/* Distanz braucht Browser-Geolocation — bei 3 Mock-Matches (alle in
+            Deutschland) bringt eine vorgetäuschte Umsetzung keinen echten
+            Mehrwert. Klar als "bald" markiert statt eine Funktion
+            vorzutäuschen, die nichts tut. */}
         <span
           title="Bald verfügbar"
           className="cursor-not-allowed rounded-full border border-border px-4 py-2 text-sm text-text-faint"
@@ -135,6 +153,7 @@ export default function DiscoverPage() {
               setCountry(ALL);
               setDiscipline(ALL);
               setLevel(ALL);
+              setTimeframe(ALL);
               setOpenOnly(false);
             }}
             className="text-sm text-text-muted underline hover:text-text"
