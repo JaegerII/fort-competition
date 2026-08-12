@@ -99,6 +99,7 @@ export default function ScorePage() {
         <div className="space-y-3">
           {scoringSquads.map((s) => {
             const done = s.shooters.filter((sh) => doneIds.has(sh.id)).length;
+            const allDone = done === s.shooters.length;
             return (
               <button
                 key={s.id}
@@ -109,9 +110,12 @@ export default function ScorePage() {
                   <p className="font-semibold">{s.name}</p>
                   <p className="text-sm text-text-muted">{s.timeSlot}</p>
                 </div>
-                <span className="font-mono text-sm text-text-muted">
-                  {done} / {s.shooters.length}
-                </span>
+                <div className="flex items-center gap-3">
+                  <span className="font-mono text-sm text-text-muted">
+                    {done} / {s.shooters.length}
+                  </span>
+                  {allDone && <Badge tone="accent">Fertig</Badge>}
+                </div>
               </button>
             );
           })}
