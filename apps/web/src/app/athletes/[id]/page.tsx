@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { athleteProfiles } from "@/lib/mock-data";
 import { Badge } from "@/components/badge";
+import { BackLink } from "@/components/back-link";
 
 export function generateStaticParams() {
   return Object.keys(athleteProfiles).map((id) => ({ id }));
@@ -29,6 +30,7 @@ export default async function AthleteProfilePage({
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-10">
+      <BackLink />
       <div className="mb-8 flex items-center gap-4">
         <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-surface-raised font-mono text-xl text-text-muted">
           {athlete.fullName
