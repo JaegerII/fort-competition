@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Menu, X, Settings, UserCircle, LogOut } from "lucide-react";
+import { Menu, X, Settings, UserCircle, LogOut, Trophy } from "lucide-react";
 import { useAuth } from "@/contexts/auth-context";
 
 // Persistenter Einstiegspunkt für Settings/Account — bewusst getrennt von
@@ -42,6 +42,14 @@ export function HamburgerMenu() {
 
             {user ? (
               <>
+                <Link
+                  href="/my-matches"
+                  onClick={() => setOpen(false)}
+                  className="flex items-center gap-3 border-t border-border px-4 py-3.5 text-sm transition-colors hover:bg-surface-raised"
+                >
+                  <Trophy size={18} className="text-text-muted" />
+                  Meine Matches
+                </Link>
                 <div className="flex items-center gap-3 border-t border-border px-4 py-3.5 text-sm">
                   <UserCircle size={18} className="text-accent" />
                   <div className="min-w-0">

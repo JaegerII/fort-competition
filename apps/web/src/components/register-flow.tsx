@@ -8,11 +8,13 @@ import { registrationSquads } from "@/lib/mock-data";
 import { availableCategories, availableDivisions } from "@/lib/wizard-data";
 import { Chip } from "@/components/chip";
 import { useAuth } from "@/contexts/auth-context";
+import { useRegistrations } from "@/contexts/registrations-context";
 
 type Step = "selection" | "squad" | "payment";
 
 export function RegisterFlow({ match }: { match: MatchSummary }) {
   const { user } = useAuth();
+  const { registerFor, isRegistered } = useRegistrations();
   const pathname = usePathname();
   const [step, setStep] = useState<Step>("selection");
   const [division, setDivision] = useState<string | null>(null);
@@ -55,31 +57,42 @@ export function RegisterFlow({ match }: { match: MatchSummary }) {
     );
   }
 
-  if (confirmed) {
+  const existing = isRegistered(match.id);
+
+  if (confirmed || (existing && !confirmed && step === "selection")) {
+    const w = confirmed ? waitlisted : existing?.status === "waitlisted";
+    const div = confirmed ? division : existing?.division;
+    const sq = confirmed
+      ? squad
+      : existing
+        ? { name: existing.squadName, timeSlot: existing.squadTimeSlot }
+        : null;
     return (
       <div className="max-w-lg mx-auto px-4 py-20 text-center">
         <div
           className={`mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full text-3xl ${
-            waitlisted
-              ? "bg-warning-dim text-warning"
-              : "bg-accent-dim text-accent"
+            w ? "bg-warning-dim text-warning" : "bg-accent-dim text-accent"
           }`}
         >
-          {waitlisted ? "⏳" : "✓"}
+          {w ? "⏳" : "✓"}
         </div>
         <h1 className="text-2xl font-semibold">
-          {waitlisted ? "Auf Warteliste gesetzt" : "Registrierung bestätigt"}
+          {confirmed
+            ? w
+              ? "Auf Warteliste gesetzt"
+              : "Registrierung bestätigt"
+            : "Du bist bereits registriert"}
         </h1>
         <p className="mt-2 text-text-muted">
-          {waitlisted ? (
+          {w ? (
             <>
-              {squad?.name} ist aktuell voll. Du bekommst eine Benachrichtigung,
+              {sq?.name} ist aktuell voll. Du bekommst eine Benachrichtigung,
               sobald ein Platz frei wird und automatisch nachgerückt wirst.
             </>
           ) : (
             <>
-              Du bist für {match.name} in {division} angemeldet
-              {squad ? ` — ${squad.name} (${squad.timeSlot})` : ""}.
+              Du bist für {match.name} in {div} angemeldet
+              {sq ? ` — ${sq.name} (${sq.timeSlot})` : ""}.
             </>
           )}
         </p>
@@ -244,7 +257,18 @@ export function RegisterFlow({ match }: { match: MatchSummary }) {
           ) : null}
 
           <button
-            onClick={() => setConfirmed(true)}
+            onClick={() => {
+              registerFor({
+                matchId: match.id,
+                matchName: match.name,
+                division: division ?? "",
+                categories,
+                squadName: squad?.name ?? "",
+                squadTimeSlot: squad?.timeSlot ?? "",
+                status: waitlisted ? "waitlisted" : "confirmed",
+              });
+              setConfirmed(true);
+            }}
             className="mt-6 w-full rounded-xl bg-accent py-3.5 font-medium text-bg hover:opacity-90 transition-opacity"
           >
             {waitlisted

@@ -7,6 +7,7 @@ import { FortLogo } from "@/components/fort-logo";
 import { BottomNav } from "@/components/bottom-nav";
 import { HamburgerMenu } from "@/components/hamburger-menu";
 import { AuthProvider } from "@/contexts/auth-context";
+import { RegistrationsProvider } from "@/contexts/registrations-context";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -63,6 +64,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           "Footer verrutscht"-Verhalten auf echten Handys. */}
       <body className="min-h-dvh flex flex-col bg-bg text-text">
         <AuthProvider>
+        <RegistrationsProvider>
         <TopographyBackground />
         <div className="bg-warning-dim border-b border-border text-warning text-xs sm:text-sm px-4 py-2 text-center">
           Prototyp (Phase 6 vorgezogen) — Fake-Daten, kein Backend, keine
@@ -108,6 +110,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           {children}
         </main>
         <BottomNav />
+        </RegistrationsProvider>
         </AuthProvider>
       </body>
     </html>
