@@ -62,6 +62,27 @@ select 'anon sieht KEINE unveröffentlichte Stage' as test,
          select 1 from stages where name = 'Unveröffentlichte Stage'
        ) then 'PASS' else 'FAIL' end as ergebnis;
 
+-- Regelwerk-Tabellen als anon LESEN — nicht nur Policies zählen, sondern
+-- tatsächlich abfragen. Genau hier lag eine Endlosrekursion zwischen den
+-- Policies von rulesets und ruleset_versions (42P17), die beim Anlegen der
+-- Migration nicht auffiel, weil sie erst zur Abfragezeit auftritt. Ein Test,
+-- der nur pg_policies inspiziert, hätte sie nie gefunden.
+select 'anon kann rulesets abfragen (keine RLS-Rekursion)' as test,
+       case when (select count(*) >= 0 from rulesets) then 'PASS' else 'FAIL' end as ergebnis;
+
+select 'anon kann ruleset_versions abfragen (keine RLS-Rekursion)' as test,
+       case when (select count(*) >= 0 from ruleset_versions) then 'PASS' else 'FAIL' end as ergebnis;
+
+-- Der Join, den die Discovery-Seite tatsächlich fährt: Competition ->
+-- Ruleset-Version -> Ruleset. Erst diese Kombination hat den Fehler ausgelöst.
+select 'anon kann Discovery-Join fahren (competitions -> ruleset)' as test,
+       case when (
+         select count(*) >= 0
+           from competitions c
+           left join ruleset_versions rv on rv.id = c.ruleset_version_id
+           left join rulesets rs on rs.id = rv.ruleset_id
+       ) then 'PASS' else 'FAIL' end as ergebnis;
+
 -- Schreibversuche als anon müssen scheitern.
 select 'anon kann kein Match anlegen' as test,
        case when not exists (

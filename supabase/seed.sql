@@ -15,13 +15,16 @@ insert into organizations (id, name, country, description) values
   ('04600000-0000-4000-8000-000000000001'::uuid, 'Shooting Club XYZ', 'Deutschland',
    'Beispielverein für den Prototyp.');
 
-insert into ranges (id, organization_id, name, address, timezone) values
+insert into ranges (id, organization_id, name, address, city, country, timezone) values
   ('4a4e0000-0000-4000-8000-000000000001'::uuid, '04600000-0000-4000-8000-000000000001'::uuid,
-   'Schießsportanlage Saarbrücken', 'Saarbrücken, Deutschland', 'Europe/Berlin'),
+   'Schießsportanlage Saarbrücken', 'Saarbrücken, Deutschland',
+   'Saarbrücken', 'Deutschland', 'Europe/Berlin'),
   ('4a4e0000-0000-4000-8000-000000000002'::uuid, '04600000-0000-4000-8000-000000000001'::uuid,
-   'Schießsportanlage Dudweiler', 'Dudweiler, Deutschland', 'Europe/Berlin'),
+   'Schießsportanlage Dudweiler', 'Dudweiler, Deutschland',
+   'Dudweiler', 'Deutschland', 'Europe/Berlin'),
   ('4a4e0000-0000-4000-8000-000000000003'::uuid, '04600000-0000-4000-8000-000000000001'::uuid,
-   'Schießsportanlage Mainz', 'Mainz, Deutschland', 'Europe/Berlin');
+   'Schießsportanlage Mainz', 'Mainz, Deutschland',
+   'Mainz', 'Deutschland', 'Europe/Berlin');
 
 -- ── Disziplinen, Zieltypen, Regelwerke ────────────────────────────────
 insert into disciplines (id, code, name) values
