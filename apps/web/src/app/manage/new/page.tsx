@@ -63,6 +63,15 @@ export default function NewMatchWizardPage() {
   // ohne die lineare "Weiter"-Prüfung zu durchlaufen — PUBLISH braucht
   // deshalb seine eigene, unabhängige Prüfung derselben Pflichtfelder.
   const canPublish = data.ruleset !== null && data.info.name.trim() !== "";
+  const duplicateOfficialNames = Array.from(
+    new Set(
+      data.officials
+        .map((o) => o.name)
+        .filter(
+          (name, i, names) => names.indexOf(name) !== names.lastIndexOf(name),
+        ),
+    ),
+  );
 
   function update<K extends keyof WizardState>(key: K, value: WizardState[K]) {
     setData((d) => ({ ...d, [key]: value }));
@@ -78,51 +87,63 @@ export default function NewMatchWizardPage() {
     });
   }
 
+  // Alle sechs Funktionen unten lesen den Vorzustand über die setData-
+  // Updater-Funktion (d.stages/d.officials), NICHT über data.stages/
+  // data.officials aus dem Render-Closure — sonst berechnen zwei Aufrufe,
+  // die im selben React-Batch landen (z. B. schnelles Doppelklicken auf
+  // "+ Stage hinzufügen"), beide denselben veralteten Vorzustand, und der
+  // zweite Klick überschreibt den ersten anstatt ihn zu ergänzen. War real
+  // reproduzierbar: mehrfaches "+ Official zuweisen" fügte nur einen
+  // Official hinzu statt mehrerer.
   function addStage() {
-    const stage: WizardStage = {
-      id: crypto.randomUUID(),
-      number: data.stages.length + 1,
-      name: `Stage ${data.stages.length + 1}`,
-      targets: 4,
-    };
-    update("stages", [...data.stages, stage]);
+    setData((d) => {
+      const stage: WizardStage = {
+        id: crypto.randomUUID(),
+        number: d.stages.length + 1,
+        name: `Stage ${d.stages.length + 1}`,
+        targets: 4,
+      };
+      return { ...d, stages: [...d.stages, stage] };
+    });
   }
 
   function updateStage(id: string, patch: Partial<WizardStage>) {
-    update(
-      "stages",
-      data.stages.map((s) => (s.id === id ? { ...s, ...patch } : s)),
-    );
+    setData((d) => ({
+      ...d,
+      stages: d.stages.map((s) => (s.id === id ? { ...s, ...patch } : s)),
+    }));
   }
 
   function removeStage(id: string) {
-    update(
-      "stages",
-      data.stages.filter((s) => s.id !== id),
-    );
+    setData((d) => ({
+      ...d,
+      stages: d.stages.filter((s) => s.id !== id),
+    }));
   }
 
   function addOfficial() {
-    const official: WizardOfficial = {
-      id: crypto.randomUUID(),
-      name: staffPool[data.officials.length % staffPool.length],
-      role: availableOfficialRoles[1],
-    };
-    update("officials", [...data.officials, official]);
+    setData((d) => {
+      const official: WizardOfficial = {
+        id: crypto.randomUUID(),
+        name: staffPool[d.officials.length % staffPool.length],
+        role: availableOfficialRoles[1],
+      };
+      return { ...d, officials: [...d.officials, official] };
+    });
   }
 
   function updateOfficial(id: string, patch: Partial<WizardOfficial>) {
-    update(
-      "officials",
-      data.officials.map((o) => (o.id === id ? { ...o, ...patch } : o)),
-    );
+    setData((d) => ({
+      ...d,
+      officials: d.officials.map((o) => (o.id === id ? { ...o, ...patch } : o)),
+    }));
   }
 
   function removeOfficial(id: string) {
-    update(
-      "officials",
-      data.officials.filter((o) => o.id !== id),
-    );
+    setData((d) => ({
+      ...d,
+      officials: d.officials.filter((o) => o.id !== id),
+    }));
   }
 
   // Gleiches Login-Gate wie /manage — s. Kommentar dort.
@@ -602,6 +623,19 @@ export default function NewMatchWizardPage() {
                     Noch keine Officials zugewiesen.
                   </p>
                 )}
+                {/* addOfficial zyklt bei > staffPool.length Officials durch
+                    denselben Pool (z. B. wird der 7. wieder Person 1) — ohne
+                    Hinweis würde die selbe Person unbemerkt für zwei Rollen
+                    gleichzeitig eingeplant, was bei einem echten Match nie
+                    funktioniert (kann nicht gleichzeitig Chief RO und
+                    Scorekeeper sein). Betrifft genauso das manuelle
+                    Umstellen eines Dropdowns auf einen bereits vergebenen
+                    Namen. */}
+                {duplicateOfficialNames.length > 0 && (
+                  <p className="mb-3 text-sm text-warning">
+                    Mehrfach zugewiesen: {duplicateOfficialNames.join(", ")}.
+                  </p>
+                )}
                 <div className="space-y-2">
                   {/* Gleiches Muster wie bei den Stages: Name-Select bekommt
                       seine eigene Reihe, Rolle+Entfernen die zweite — das
@@ -613,7 +647,11 @@ export default function NewMatchWizardPage() {
                       className="flex flex-col gap-3 rounded-xl border border-border bg-surface-raised p-3 sm:flex-row sm:items-center"
                     >
                       <select
-                        className="min-w-0 flex-1 rounded-lg border border-border bg-surface px-3 py-2 focus:border-accent focus:outline-none"
+                        className={`min-w-0 flex-1 rounded-lg border bg-surface px-3 py-2 focus:border-accent focus:outline-none ${
+                          duplicateOfficialNames.includes(o.name)
+                            ? "border-warning/60"
+                            : "border-border"
+                        }`}
                         value={o.name}
                         onChange={(e) =>
                           updateOfficial(o.id, { name: e.target.value })
