@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import { matches } from "@/lib/mock-data";
+import { matchStatusLabel, matchStatusTone } from "@/lib/match-status";
 import { Badge } from "@/components/badge";
 import { Leaderboard } from "@/components/leaderboard";
 import { RegisterCta } from "@/components/register-cta";
@@ -26,13 +27,9 @@ export default async function MatchPage({
       <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
         <div>
           <div className="mb-2 flex items-center gap-2">
-            {match.status === "live" && <Badge tone="live">Live</Badge>}
-            {match.status === "completed" && (
-              <Badge tone="neutral">Beendet</Badge>
-            )}
-            {match.status === "upcoming" && (
-              <Badge tone="accent">Bevorstehend</Badge>
-            )}
+            <Badge tone={matchStatusTone[match.status]}>
+              {matchStatusLabel[match.status]}
+            </Badge>
             <span className="text-sm text-text-muted">
               {match.discipline} · {match.level}
             </span>

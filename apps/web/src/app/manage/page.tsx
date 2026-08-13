@@ -4,21 +4,7 @@ import Link from "next/link";
 import { matches } from "@/lib/mock-data";
 import { Badge } from "@/components/badge";
 import { useAuth } from "@/contexts/auth-context";
-
-const statusLabel: Record<(typeof matches)[number]["status"], string> = {
-  live: "Live",
-  upcoming: "Bevorstehend",
-  completed: "Beendet",
-};
-
-const statusTone: Record<
-  (typeof matches)[number]["status"],
-  "live" | "accent" | "neutral"
-> = {
-  live: "live",
-  upcoming: "accent",
-  completed: "neutral",
-};
+import { matchStatusLabel, matchStatusTone } from "@/lib/match-status";
 
 // Director- und RO-Bereiche (hier, /manage/new, /score) waren bisher die
 // einzigen Rollen-Flows ohne Login-Gate — im Gegensatz zu Registrierung/
@@ -78,8 +64,8 @@ export default function ManageDashboardPage() {
           >
             <div>
               <div className="mb-1 flex items-center gap-2">
-                <Badge tone={statusTone[m.status]}>
-                  {statusLabel[m.status]}
+                <Badge tone={matchStatusTone[m.status]}>
+                  {matchStatusLabel[m.status]}
                 </Badge>
                 <span className="text-sm text-text-muted">
                   {m.discipline} · {m.level}

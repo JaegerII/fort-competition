@@ -1,16 +1,11 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { matches, type MatchStatus } from "@/lib/mock-data";
+import { matches } from "@/lib/mock-data";
+import { matchStatusLabel } from "@/lib/match-status";
 import { MatchCard } from "@/components/match-card";
 
 const ALL = "Alle";
-
-const statusLabel: Record<MatchStatus, string> = {
-  live: "Live",
-  upcoming: "Bevorstehend",
-  completed: "Beendet",
-};
 
 function FilterSelect({
   label,
@@ -69,7 +64,7 @@ export default function DiscoverPage() {
   const timeframes = useMemo(
     () =>
       Array.from(new Set(matches.map((m) => m.status))).map(
-        (s) => statusLabel[s],
+        (s) => matchStatusLabel[s],
       ),
     [],
   );
@@ -78,7 +73,8 @@ export default function DiscoverPage() {
     if (country !== ALL && m.country !== country) return false;
     if (discipline !== ALL && m.discipline !== discipline) return false;
     if (level !== ALL && m.level !== level) return false;
-    if (timeframe !== ALL && statusLabel[m.status] !== timeframe) return false;
+    if (timeframe !== ALL && matchStatusLabel[m.status] !== timeframe)
+      return false;
     if (openOnly && m.registrationStatus !== "open") return false;
     return true;
   });

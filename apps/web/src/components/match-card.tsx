@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { MatchSummary } from "@/lib/mock-data";
+import { matchStatusLabel, matchStatusTone } from "@/lib/match-status";
 import { Badge } from "./badge";
 
 const registrationLabel: Record<MatchSummary["registrationStatus"], string> = {
@@ -24,13 +25,27 @@ export function MatchCard({ match }: { match: MatchSummary }) {
       className="block min-w-0 rounded-2xl border border-border bg-surface p-5 transition-colors hover:border-accent/50 hover:bg-surface-raised"
     >
       <div className="flex items-start justify-between gap-3">
-        <div>
+        {/* min-w-0 + shrink-0: das Badge ist whitespace-nowrap und jetzt
+            deutlich breiter als das frühere "Live" — ohne min-w-0 könnte der
+            Titelblock nicht unter seine Content-Breite schrumpfen und würde
+            das Badge aus der Karte drängen (dieselbe Falle wie bei den
+            Stepper-Grids, s. score/page.tsx). */}
+        <div className="min-w-0">
           <h3 className="text-lg font-semibold">{match.name}</h3>
           <p className="text-sm text-text-muted">
             {match.city}, {match.country}
           </p>
         </div>
-        {match.status === "live" && <Badge tone="live">Live</Badge>}
+        {/* Alle drei Status, nicht nur "live" (wie bisher) — sonst sieht ein
+            beendetes Match in der Übersicht exakt aus wie ein bevorstehendes:
+            beide zeigen unten nur "Registrierung geschlossen", was für ein
+            volles kommendes Match genauso gilt wie für ein längst gelaufenes.
+            Die Detailseite badge't seit jeher alle drei; hier fehlte es. */}
+        <span className="shrink-0">
+          <Badge tone={matchStatusTone[match.status]}>
+            {matchStatusLabel[match.status]}
+          </Badge>
+        </span>
       </div>
 
       <div className="mt-4 flex flex-wrap gap-2 text-xs text-text-muted">
