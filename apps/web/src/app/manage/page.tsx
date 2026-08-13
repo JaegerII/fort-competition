@@ -1,6 +1,9 @@
+"use client";
+
 import Link from "next/link";
 import { matches } from "@/lib/mock-data";
 import { Badge } from "@/components/badge";
+import { useAuth } from "@/contexts/auth-context";
 
 const statusLabel: Record<(typeof matches)[number]["status"], string> = {
   live: "Live",
@@ -17,7 +20,33 @@ const statusTone: Record<
   completed: "neutral",
 };
 
+// Director- und RO-Bereiche (hier, /manage/new, /score) waren bisher die
+// einzigen Rollen-Flows ohne Login-Gate — im Gegensatz zu Registrierung/
+// Profil/Meine Matches konnte jeder ohne Anmeldung direkt Matches anlegen
+// oder Scores erfassen. Volle Rollenprüfung (wer ist tatsächlich Director
+// vs. Athlet) braucht echtes RBAC (s. auth-context.tsx-Kommentar, Spec
+// §21, Phase 7) — dieses Mock-Auth kennt nur "eingeloggt oder nicht".
+// Ein einfaches Login-Gate ist trotzdem ehrlicher als gar keins.
 export default function ManageDashboardPage() {
+  const { user } = useAuth();
+
+  if (!user) {
+    return (
+      <div className="max-w-sm mx-auto px-4 py-20 text-center">
+        <h1 className="text-xl font-semibold">Anmeldung erforderlich</h1>
+        <p className="mt-2 text-sm text-text-muted">
+          Melde dich an, um das Match-Director-Dashboard zu nutzen.
+        </p>
+        <Link
+          href="/login?returnTo=%2Fmanage"
+          className="mt-6 inline-block rounded-xl bg-accent px-5 py-3 font-medium text-bg hover:opacity-90 transition-opacity"
+        >
+          Zum Login
+        </Link>
+      </div>
+    );
+  }
+
   return (
     <div className="max-w-5xl mx-auto px-4 py-10">
       <div className="mb-8 flex flex-wrap items-center justify-between gap-4">

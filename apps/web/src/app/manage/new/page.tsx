@@ -15,6 +15,7 @@ import {
   type WizardStepId,
 } from "@/lib/wizard-data";
 import { Chip } from "@/components/chip";
+import { useAuth } from "@/contexts/auth-context";
 
 function Field({
   label,
@@ -37,6 +38,7 @@ const inputClass =
   "w-full rounded-xl border border-border bg-surface-raised px-4 py-2.5 focus:border-accent focus:outline-none";
 
 export default function NewMatchWizardPage() {
+  const { user } = useAuth();
   const [step, setStep] = useState<WizardStepId>("ruleset");
   const [data, setData] = useState<WizardState>(initialWizardState);
   const [published, setPublished] = useState(false);
@@ -120,6 +122,24 @@ export default function NewMatchWizardPage() {
     update(
       "officials",
       data.officials.filter((o) => o.id !== id),
+    );
+  }
+
+  // Gleiches Login-Gate wie /manage — s. Kommentar dort.
+  if (!user) {
+    return (
+      <div className="max-w-sm mx-auto px-4 py-20 text-center">
+        <h1 className="text-xl font-semibold">Anmeldung erforderlich</h1>
+        <p className="mt-2 text-sm text-text-muted">
+          Melde dich an, um ein neues Match zu erstellen.
+        </p>
+        <Link
+          href="/login?returnTo=%2Fmanage%2Fnew"
+          className="mt-6 inline-block rounded-xl bg-accent px-5 py-3 font-medium text-bg hover:opacity-90 transition-opacity"
+        >
+          Zum Login
+        </Link>
+      </div>
     );
   }
 

@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import Link from "next/link";
 import {
   scoringSquads,
   scoringStage,
@@ -8,6 +9,7 @@ import {
 } from "@/lib/mock-data";
 import { Stepper } from "@/components/stepper";
 import { Badge } from "@/components/badge";
+import { useAuth } from "@/contexts/auth-context";
 
 type TargetHits = { A: number; C: number; D: number; M: number; NS: number };
 type TargetState = Record<string, TargetHits>;
@@ -35,6 +37,7 @@ function calcPoints(targets: TargetState, procedural: number, other: number) {
 }
 
 export default function ScorePage() {
+  const { user } = useAuth();
   const [squadId, setSquadId] = useState<string | null>(null);
   const [shooterId, setShooterId] = useState<string | null>(null);
   const [mode, setMode] = useState<"queue" | "score" | "review">("queue");
@@ -86,6 +89,24 @@ export default function ScorePage() {
       setShooterId(null);
       setMode("queue");
     }
+  }
+
+  // Gleiches Login-Gate wie /manage — s. Kommentar dort.
+  if (!user) {
+    return (
+      <div className="max-w-sm mx-auto px-4 py-20 text-center">
+        <h1 className="text-xl font-semibold">Anmeldung erforderlich</h1>
+        <p className="mt-2 text-sm text-text-muted">
+          Melde dich an, um Scores zu erfassen.
+        </p>
+        <Link
+          href="/login?returnTo=%2Fscore"
+          className="mt-6 inline-block rounded-xl bg-accent px-5 py-3 font-medium text-bg hover:opacity-90 transition-opacity"
+        >
+          Zum Login
+        </Link>
+      </div>
+    );
   }
 
   // ── Squad-Auswahl ──────────────────────────────────────────────
