@@ -13,6 +13,12 @@ import { useAuth } from "@/contexts/auth-context";
 
 type TargetHits = { A: number; C: number; D: number; M: number; NS: number };
 type TargetState = Record<string, TargetHits>;
+interface ScoreEntry {
+  targets: TargetState;
+  procedural: number;
+  other: number;
+  time: string;
+}
 
 const emptyHits: TargetHits = { A: 0, C: 0, D: 0, M: 0, NS: 0 };
 
@@ -41,7 +47,14 @@ export default function ScorePage() {
   const [squadId, setSquadId] = useState<string | null>(null);
   const [shooterId, setShooterId] = useState<string | null>(null);
   const [mode, setMode] = useState<"queue" | "score" | "review">("queue");
-  const [doneIds, setDoneIds] = useState<Set<string>>(new Set());
+  // Ersetzt das frühere reine doneIds-Set: das hat nur GEMERKT, welche
+  // Schützen fertig sind, aber die tatsächlich erfassten Werte (Treffer,
+  // Zeit, Strafen) nirgends gespeichert — sobald man weiterklickte, waren
+  // sie unwiderruflich weg. Ein RO, der einen Tippfehler bemerkt (z. B.
+  // "5" statt "3" A-Treffer), hatte keine Möglichkeit, das zu korrigieren,
+  // nur ✕ komplett gesperrte Queue-Einträge. scores speichert den vollen
+  // Eintrag pro Schütze; doneIds/allDone werden daraus abgeleitet.
+  const [scores, setScores] = useState<Record<string, ScoreEntry>>({});
   const [offline, setOffline] = useState(false);
   const [pendingSync, setPendingSync] = useState(0);
 
@@ -69,19 +82,43 @@ export default function ScorePage() {
   }
 
   function pickShooter(id: string) {
+    const existing = scores[id];
     setShooterId(id);
-    resetEntry();
+    if (existing) {
+      setTargets(existing.targets);
+      setProcedural(existing.procedural);
+      setOther(existing.other);
+      setTime(existing.time);
+    } else {
+      resetEntry();
+    }
     setMode("score");
   }
 
   function confirmScore() {
     if (!shooterId) return;
-    setDoneIds((prev) => new Set(prev).add(shooterId));
+    const wasAlreadyScored = Boolean(scores[shooterId]);
+    const nextScores = {
+      ...scores,
+      [shooterId]: { targets, procedural, other, time },
+    };
+    setScores(nextScores);
     if (offline) {
       setPendingSync((n) => n + 1);
     }
+
+    // Korrektur eines bereits erfassten Schützen: zurück zur Queue statt
+    // automatisch zum nächsten unerfassten Schützen weiterzuspringen — die
+    // RO hat die Queue bewusst verlassen, um genau diesen einen Eintrag zu
+    // korrigieren, nicht um die normale Erfassungsreihenfolge fortzusetzen.
+    if (wasAlreadyScored) {
+      setShooterId(null);
+      setMode("queue");
+      return;
+    }
+
     const remaining = squad?.shooters.find(
-      (s) => s.id !== shooterId && !doneIds.has(s.id),
+      (s) => s.id !== shooterId && !nextScores[s.id],
     );
     if (remaining) {
       pickShooter(remaining.id);
@@ -119,7 +156,7 @@ export default function ScorePage() {
         </p>
         <div className="space-y-3">
           {scoringSquads.map((s) => {
-            const done = s.shooters.filter((sh) => doneIds.has(sh.id)).length;
+            const done = s.shooters.filter((sh) => scores[sh.id]).length;
             const allDone = done === s.shooters.length;
             return (
               <button
@@ -147,7 +184,7 @@ export default function ScorePage() {
 
   // ── Shooter-Queue ──────────────────────────────────────────────
   if (mode === "queue") {
-    const doneCount = squad.shooters.filter((s) => doneIds.has(s.id)).length;
+    const doneCount = squad.shooters.filter((s) => scores[s.id]).length;
     const squadComplete = doneCount === squad.shooters.length;
     return (
       <div className="max-w-2xl mx-auto px-4 py-10">
@@ -184,16 +221,19 @@ export default function ScorePage() {
         )}
 
         <div className="space-y-3">
+          {/* done-Zeilen sind jetzt bewusst klickbar statt disabled — führt
+              zurück in den Score-Screen mit den zuvor erfassten Werten
+              vorausgefüllt, statt den Schützen nach dem ersten CONFIRM
+              endgültig zu sperren (s. scores-Kommentar oben). */}
           {squad.shooters.map((s) => {
-            const done = doneIds.has(s.id);
+            const done = Boolean(scores[s.id]);
             return (
               <button
                 key={s.id}
                 onClick={() => pickShooter(s.id)}
-                disabled={done}
                 className={`flex w-full items-center justify-between rounded-2xl border p-5 text-left transition-colors ${
                   done
-                    ? "border-border bg-surface/40 opacity-50"
+                    ? "border-accent/30 bg-surface/60 hover:border-accent/60 hover:bg-surface-raised"
                     : "border-border bg-surface hover:border-accent/50 hover:bg-surface-raised"
                 }`}
               >
@@ -202,7 +242,10 @@ export default function ScorePage() {
                   <p className="text-sm text-text-muted">{s.division}</p>
                 </div>
                 {done ? (
-                  <Badge tone="accent">Erfasst</Badge>
+                  <div className="flex items-center gap-2">
+                    <Badge tone="accent">Erfasst</Badge>
+                    <span className="text-xs text-text-faint">Bearbeiten →</span>
+                  </div>
                 ) : (
                   <span className="text-text-faint">→</span>
                 )}
@@ -275,40 +318,52 @@ export default function ScorePage() {
                 <Stepper
                   label="A"
                   value={targets[t.id].A}
-                  onChange={(v) =>
-                    setTargets((p) => ({ ...p, [t.id]: { ...p[t.id], A: v } }))
+                  onChange={(updater) =>
+                    setTargets((p) => ({
+                      ...p,
+                      [t.id]: { ...p[t.id], A: updater(p[t.id].A) },
+                    }))
                   }
                 />
                 <Stepper
                   label="C"
                   value={targets[t.id].C}
-                  onChange={(v) =>
-                    setTargets((p) => ({ ...p, [t.id]: { ...p[t.id], C: v } }))
+                  onChange={(updater) =>
+                    setTargets((p) => ({
+                      ...p,
+                      [t.id]: { ...p[t.id], C: updater(p[t.id].C) },
+                    }))
                   }
                 />
                 <Stepper
                   label="D"
                   value={targets[t.id].D}
-                  onChange={(v) =>
-                    setTargets((p) => ({ ...p, [t.id]: { ...p[t.id], D: v } }))
+                  onChange={(updater) =>
+                    setTargets((p) => ({
+                      ...p,
+                      [t.id]: { ...p[t.id], D: updater(p[t.id].D) },
+                    }))
                   }
                 />
                 <Stepper
                   label="M"
                   tone="warning"
                   value={targets[t.id].M}
-                  onChange={(v) =>
-                    setTargets((p) => ({ ...p, [t.id]: { ...p[t.id], M: v } }))
+                  onChange={(updater) =>
+                    setTargets((p) => ({
+                      ...p,
+                      [t.id]: { ...p[t.id], M: updater(p[t.id].M) },
+                    }))
                   }
                 />
                 <Stepper
                   label="NS"
                   tone="live"
                   value={targets[t.id].NS}
-                  onChange={(v) =>
+                  onChange={(updater) =>
                     setTargets((p) => ({
                       ...p,
-                      [t.id]: { ...p[t.id], NS: v },
+                      [t.id]: { ...p[t.id], NS: updater(p[t.id].NS) },
                     }))
                   }
                 />
