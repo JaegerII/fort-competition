@@ -63,6 +63,18 @@ export default function NewMatchWizardPage() {
   // ohne die lineare "Weiter"-Prüfung zu durchlaufen — PUBLISH braucht
   // deshalb seine eigene, unabhängige Prüfung derselben Pflichtfelder.
   const canPublish = data.ruleset !== null && data.info.name.trim() !== "";
+  // Nur Ruleset/Info haben echte Pflichtfelder (s. canProceed oben) — die
+  // Sidebar-Checkmarks zeigten "✓" aber bisher rein nach Position
+  // (i < stepIndex), unabhängig davon, ob überhaupt etwas eingetragen war.
+  // Wer über die freie Sidebar-Navigation direkt zu Review springt, sah so
+  // ein fälschliches "✓ Ruleset" ohne gewähltes Ruleset. Für die übrigen,
+  // bewusst optionalen Schritte bleibt "besucht" (Position) weiterhin ein
+  // sinnvoller Indikator — dafür gibt es keinen echten "vollständig"-Status.
+  function isStepFilled(id: WizardStepId): boolean {
+    if (id === "ruleset") return data.ruleset !== null;
+    if (id === "info") return data.info.name.trim() !== "";
+    return true;
+  }
   const duplicateOfficialNames = Array.from(
     new Set(
       data.officials
@@ -202,7 +214,7 @@ export default function NewMatchWizardPage() {
         <nav className="flex min-w-0 gap-2 overflow-x-auto lg:flex-col lg:overflow-visible">
           {wizardSteps.map((s, i) => {
             const isActive = s.id === step;
-            const isDone = i < stepIndex;
+            const isDone = i < stepIndex && isStepFilled(s.id);
             return (
               <button
                 key={s.id}
