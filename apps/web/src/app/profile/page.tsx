@@ -35,9 +35,14 @@ export default function ProfilePage() {
   }
 
   const initials = user.name.slice(0, 2).toUpperCase();
-  const confirmedCount = registrations.filter(
-    (r) => r.status === "confirmed",
-  ).length;
+  // "waitlisted" heißt Squad-Warteliste, nicht abgelehnte Registrierung —
+  // die Match-Anmeldung selbst ist bereits erfolgt (s. register-flow.tsx:
+  // registerFor() läuft in beiden Fällen, nur der Bestätigungstext
+  // unterscheidet sich). my-matches.tsx zeigt konsequent alle
+  // Registrierungen unabhängig vom Status; diese Kachel zählte bisher nur
+  // "confirmed" und unterschlug damit Warteliste-Registrierungen — ein
+  // Athlet mit ausschließlich Warteliste-Plätzen sah hier fälschlich "0".
+  const registeredCount = registrations.length;
 
   return (
     <div className="max-w-2xl mx-auto px-4 py-10">
@@ -54,7 +59,7 @@ export default function ProfilePage() {
       <div className="mb-6 grid grid-cols-2 gap-3">
         <div className="rounded-2xl border border-border bg-surface p-4 text-center">
           <p className="font-mono text-2xl font-semibold">
-            {confirmedCount}
+            {registeredCount}
           </p>
           <p className="mt-1 text-xs uppercase tracking-wide text-text-muted">
             Registrierte Matches
