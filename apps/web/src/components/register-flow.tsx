@@ -178,6 +178,7 @@ export function RegisterFlow({ match }: { match: MatchSummary }) {
               <button
                 key={d}
                 onClick={() => setDivision(d)}
+                aria-pressed={division === d}
                 className={`rounded-xl border p-3 text-left text-sm transition-colors ${
                   division === d
                     ? "border-accent bg-accent-dim text-accent"

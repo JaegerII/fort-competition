@@ -18,6 +18,7 @@ export function HamburgerMenu() {
       <button
         onClick={() => setOpen((o) => !o)}
         aria-label={open ? "Menü schließen" : "Menü öffnen"}
+        aria-expanded={open}
         className="flex h-10 w-10 items-center justify-center rounded-lg text-text-muted transition-colors hover:bg-surface-raised hover:text-text"
       >
         {open ? <X size={22} /> : <Menu size={22} />}

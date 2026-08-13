@@ -13,6 +13,7 @@ export function Chip({
     <button
       type="button"
       onClick={onClick}
+      aria-pressed={active}
       className={`rounded-full border px-4 py-2 text-sm transition-colors ${
         active
           ? "border-accent bg-accent-dim text-accent"

@@ -76,6 +76,7 @@ export default function SettingsPage() {
       <div className="mt-3 overflow-hidden rounded-2xl border border-border bg-surface">
         <button
           onClick={() => setAboutOpen((v) => !v)}
+          aria-expanded={aboutOpen}
           className="flex w-full items-center justify-between px-4 py-3.5 text-left text-sm transition-colors hover:bg-surface-raised"
         >
           <span>Über FORT Competition</span>

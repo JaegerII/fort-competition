@@ -123,6 +123,7 @@ export default function DiscoverPage() {
         />
         <button
           onClick={() => setOpenOnly((v) => !v)}
+          aria-pressed={openOnly}
           className={`rounded-full border px-4 py-2 text-sm transition-colors ${
             openOnly
               ? "border-accent bg-accent-dim text-accent"

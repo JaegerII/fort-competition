@@ -253,6 +253,7 @@ export default function NewMatchWizardPage() {
                     <button
                       key={r.id}
                       onClick={() => update("ruleset", r.id)}
+                      aria-pressed={data.ruleset === r.id}
                       className={`rounded-2xl border p-5 text-left transition-colors ${
                         data.ruleset === r.id
                           ? "border-accent bg-accent-dim"
