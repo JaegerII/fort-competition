@@ -6,6 +6,7 @@ import { TopographyBackground } from "@/components/topography-background";
 import { FortLogo } from "@/components/fort-logo";
 import { BottomNav } from "@/components/bottom-nav";
 import { HamburgerMenu } from "@/components/hamburger-menu";
+import { HeaderNav } from "@/components/header-nav";
 import { AuthProvider } from "@/contexts/auth-context";
 import { RegistrationsProvider } from "@/contexts/registrations-context";
 
@@ -82,23 +83,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
                 die Navigation — beides gleichzeitig zu zeigen wäre auf dem
                 Phone redundant (Spec §25: pro Device-Klasse optimieren, nicht
                 nur skalieren). */}
-            <div className="hidden md:flex gap-4 text-sm text-text-muted">
-              <Link href="/" className="hover:text-text transition-colors">
-                Matches
-              </Link>
-              <Link
-                href="/matches/saarland-open-2027"
-                className="hover:text-text transition-colors"
-              >
-                Live-Match
-              </Link>
-              <Link href="/score" className="hover:text-text transition-colors">
-                RO-Scoring
-              </Link>
-              <Link href="/manage" className="hover:text-text transition-colors">
-                Match Director
-              </Link>
-            </div>
+            <HeaderNav />
             <HamburgerMenu />
           </nav>
         </header>

@@ -430,6 +430,7 @@ function ScoreHeader({
       </div>
       <button
         onClick={onToggleOffline}
+        aria-pressed={offline}
         className="text-right"
         title="Offline nur zu Demo-Zwecken simulierbar"
       >
