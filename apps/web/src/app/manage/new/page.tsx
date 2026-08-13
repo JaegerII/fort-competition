@@ -478,6 +478,7 @@ export default function NewMatchWizardPage() {
                   <Field label="Gebühr">
                     <input
                       type="number"
+                      min={0}
                       className={inputClass}
                       value={data.registration.fee}
                       onChange={(e) =>
@@ -538,6 +539,7 @@ export default function NewMatchWizardPage() {
                   <Field label="Kapazität (Teilnehmer)">
                     <input
                       type="number"
+                      min={1}
                       className={inputClass}
                       value={data.registration.capacity}
                       onChange={(e) =>
@@ -569,6 +571,7 @@ export default function NewMatchWizardPage() {
                   <Field label="Anzahl Squads">
                     <input
                       type="number"
+                      min={1}
                       className={inputClass}
                       value={data.squads.count}
                       onChange={(e) =>
@@ -583,6 +586,7 @@ export default function NewMatchWizardPage() {
                   <Field label="Kapazität pro Squad">
                     <input
                       type="number"
+                      min={1}
                       className={inputClass}
                       value={data.squads.capacityPerSquad}
                       onChange={(e) =>
