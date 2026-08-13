@@ -233,10 +233,19 @@ export default function ScorePage() {
         />
 
         <div className="mb-6 rounded-2xl border border-border bg-surface p-5">
-          <label className="mb-2 block text-xs font-medium uppercase tracking-wide text-text-muted">
+          {/* label hatte weder htmlFor noch umschloss es das input (beide
+              waren nur lose Geschwister im selben div) — programmatisch
+              also NICHT verknüpft, ein Screen-Reader-Nutzer hätte beim
+              Fokussieren des wichtigsten Felds auf dem sicherheitskritischen
+              RO-Scoring-Screen keine Ankündigung bekommen. */}
+          <label
+            htmlFor="score-time"
+            className="mb-2 block text-xs font-medium uppercase tracking-wide text-text-muted"
+          >
             Zeit (Sekunden)
           </label>
           <input
+            id="score-time"
             type="number"
             inputMode="decimal"
             step="0.01"

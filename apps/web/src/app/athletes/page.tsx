@@ -40,6 +40,7 @@ export default function AthletesIndexPage() {
         value={query}
         onChange={(e) => setQuery(e.target.value)}
         placeholder="Nach Namen suchen…"
+        aria-label="Athleten nach Namen suchen"
         className="mb-6 w-full rounded-xl border border-border bg-surface-raised px-4 py-3 focus:border-accent focus:outline-none"
       />
 

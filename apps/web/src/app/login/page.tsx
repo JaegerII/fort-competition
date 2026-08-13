@@ -59,6 +59,7 @@ function LoginForm() {
           type="email"
           required
           placeholder="deine@email.de"
+          aria-label="E-Mail-Adresse"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           className="w-full rounded-xl border border-border bg-surface-raised px-4 py-3 focus:border-accent focus:outline-none"
