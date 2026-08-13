@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import { useAuth } from "@/contexts/auth-context";
 import { useRegistrations } from "@/contexts/registrations-context";
@@ -11,7 +12,15 @@ import { Badge } from "@/components/badge";
 // register-flow.tsx beim Bestätigen befüllt.
 export default function MyMatchesPage() {
   const { user } = useAuth();
-  const { registrations } = useRegistrations();
+  const { registrations, cancelRegistration } = useRegistrations();
+  // Bisher ging Stornieren nur über einen Umweg (Match-Seite → Registrieren-
+  // Seite → dortiger Cancel-Button, s. register-flow.tsx). "Meine Matches"
+  // ist aber genau der Ort, an dem man seine Registrierungen erwarten würde
+  // verwalten zu können — deshalb dieselbe Aktion direkt hier, ohne die
+  // Cancel-Logik zu duplizieren (nur der bestehende Context-Call).
+  const [confirmingCancelId, setConfirmingCancelId] = useState<string | null>(
+    null,
+  );
 
   if (!user) {
     return (
@@ -47,27 +56,66 @@ export default function MyMatchesPage() {
       ) : (
         <div className="space-y-3">
           {registrations.map((r) => (
-            <Link
+            <div
               key={r.matchId}
-              href={`/matches/${r.matchId}`}
-              className="block rounded-2xl border border-border bg-surface p-5 transition-colors hover:border-accent/50 hover:bg-surface-raised"
+              className="rounded-2xl border border-border bg-surface p-5"
             >
-              <div className="mb-2 flex items-center justify-between gap-2">
-                <p className="font-semibold">{r.matchName}</p>
-                <Badge tone={r.status === "waitlisted" ? "warning" : "accent"}>
-                  {r.status === "waitlisted" ? "Warteliste" : "Angemeldet"}
-                </Badge>
-              </div>
-              <p className="text-sm text-text-muted">
-                {r.division}
-                {r.categories.length > 0 && ` · ${r.categories.join(", ")}`}
-              </p>
-              {r.squadName && (
-                <p className="mt-1 text-sm text-text-faint">
-                  {r.squadName} · {r.squadTimeSlot}
+              <Link
+                href={`/matches/${r.matchId}`}
+                className="block transition-colors hover:text-accent"
+              >
+                <div className="mb-2 flex items-center justify-between gap-2">
+                  <p className="font-semibold">{r.matchName}</p>
+                  <Badge
+                    tone={r.status === "waitlisted" ? "warning" : "accent"}
+                  >
+                    {r.status === "waitlisted" ? "Warteliste" : "Angemeldet"}
+                  </Badge>
+                </div>
+                <p className="text-sm text-text-muted">
+                  {r.division}
+                  {r.categories.length > 0 &&
+                    ` · ${r.categories.join(", ")}`}
                 </p>
-              )}
-            </Link>
+                {r.squadName && (
+                  <p className="mt-1 text-sm text-text-faint">
+                    {r.squadName} · {r.squadTimeSlot}
+                  </p>
+                )}
+              </Link>
+
+              <div className="mt-3 border-t border-border pt-3">
+                {confirmingCancelId === r.matchId ? (
+                  <div className="flex flex-wrap items-center gap-2">
+                    <p className="mr-auto text-sm text-text-muted">
+                      Registrierung wirklich stornieren?
+                    </p>
+                    <button
+                      onClick={() => {
+                        cancelRegistration(r.matchId);
+                        setConfirmingCancelId(null);
+                      }}
+                      className="rounded-lg bg-live px-3 py-1.5 text-sm font-medium text-white hover:opacity-90 transition-opacity"
+                    >
+                      Wirklich stornieren
+                    </button>
+                    <button
+                      onClick={() => setConfirmingCancelId(null)}
+                      className="rounded-lg border border-border px-3 py-1.5 text-sm hover:bg-surface-raised transition-colors"
+                    >
+                      Abbrechen
+                    </button>
+                  </div>
+                ) : (
+                  <button
+                    onClick={() => setConfirmingCancelId(r.matchId)}
+                    className="text-sm text-text-muted hover:text-live transition-colors"
+                  >
+                    Registrierung stornieren
+                  </button>
+                )}
+              </div>
+            </div>
           ))}
         </div>
       )}
