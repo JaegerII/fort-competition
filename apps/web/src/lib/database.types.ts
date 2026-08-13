@@ -1077,6 +1077,7 @@ export type Database = {
           display_name: string
           id: string
           locale: string | null
+          slug: string | null
           user_id: string | null
         }
         Insert: {
@@ -1088,6 +1089,7 @@ export type Database = {
           display_name: string
           id?: string
           locale?: string | null
+          slug?: string | null
           user_id?: string | null
         }
         Update: {
@@ -1099,6 +1101,7 @@ export type Database = {
           display_name?: string
           id?: string
           locale?: string | null
+          slug?: string | null
           user_id?: string | null
         }
         Relationships: [
@@ -1405,6 +1408,37 @@ export type Database = {
           waitlisted_count: number | null
         }
         Relationships: []
+      }
+      public_leaderboard: {
+        Row: {
+          competition_id: string | null
+          division_name: string | null
+          hit_factor: number | null
+          percentage: number | null
+          points: number | null
+          rank: number | null
+          scope: Database["public"]["Enums"]["result_scope"] | null
+          scope_ref_id: string | null
+          shooter_country: string | null
+          shooter_name: string | null
+          shooter_slug: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "results_competition_id_fkey"
+            columns: ["competition_id"]
+            isOneToOne: false
+            referencedRelation: "competitions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "results_competition_id_fkey"
+            columns: ["competition_id"]
+            isOneToOne: false
+            referencedRelation: "public_competition_stats"
+            referencedColumns: ["competition_id"]
+          },
+        ]
       }
     }
     Functions: {

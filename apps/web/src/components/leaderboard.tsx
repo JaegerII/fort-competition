@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { divisions, leaderboard, type LeaderboardEntry } from "@/lib/mock-data";
+import { type LeaderboardEntry } from "@/lib/mock-data";
 
 function MovementIndicator({ movement }: { movement: number }) {
   if (movement === 0) {
@@ -58,9 +58,27 @@ function MobileRow({
   );
 }
 
-export function Leaderboard() {
-  const [active, setActive] = useState<string>("Overall");
-  const rows = leaderboard[active] ?? [];
+// Divisionen und Wertungen kommen als Prop von der Server-Komponente, statt
+// hier direkt aus mock-data importiert zu werden — sonst wäre keine
+// Datenbankabfrage möglich, ohne die Tab-Logik in einen Client-Roundtrip zu
+// ziehen (gleiche Aufteilung wie bei DiscoveryClient).
+export function Leaderboard({
+  divisions,
+  entries,
+}: {
+  divisions: string[];
+  entries: Record<string, LeaderboardEntry[]>;
+}) {
+  const [active, setActive] = useState<string>(divisions[0] ?? "Overall");
+  const rows = entries[active] ?? [];
+
+  if (divisions.length === 0) {
+    return (
+      <div className="rounded-2xl border border-border bg-surface p-8 text-center text-text-muted">
+        Für dieses Match liegen noch keine Ergebnisse vor.
+      </div>
+    );
+  }
 
   return (
     <div>

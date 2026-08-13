@@ -1,6 +1,9 @@
 import { supabase } from "./supabase";
 import {
+  divisions as mockDivisions,
+  leaderboard as mockLeaderboard,
   matches as mockMatches,
+  type LeaderboardEntry,
   type MatchStatus,
   type MatchSummary,
   type RegistrationStatus,
@@ -147,4 +150,124 @@ export async function getMatches(): Promise<MatchSummary[]> {
       stagesDone: 0,
     };
   });
+}
+
+// Slugs aller öffentlichen Matches — für generateStaticParams beim
+// statischen Export. Fällt wie alles andere auf die Mock-Daten zurück,
+// damit ein Build ohne Datenbank (GitHub-Pages-Demo) weiterhin
+// funktioniert.
+export async function getMatchSlugs(): Promise<string[]> {
+  if (!supabase) return mockMatches.map((m) => m.id);
+
+  const { data, error } = await supabase.from("competitions").select("slug");
+  if (error || !data) {
+    console.error("Supabase: Match-Slugs konnten nicht geladen werden.", error);
+    return mockMatches.map((m) => m.id);
+  }
+  return data.map((c) => c.slug);
+}
+
+export async function getMatch(slug: string): Promise<MatchSummary | null> {
+  const all = await getMatches();
+  return all.find((m) => m.id === slug) ?? null;
+}
+
+// "Lena Hoffmann" -> "L. Hoffmann", wie bisher in der Rangliste dargestellt.
+// Die Kurzform ist Anzeigelogik, kein Datenbankfeld — display_name bleibt
+// vollständig, damit Suche und Profilseite den echten Namen zeigen.
+function abbreviateName(fullName: string): string {
+  const parts = fullName.trim().split(/\s+/);
+  if (parts.length < 2) return fullName;
+  const last = parts[parts.length - 1];
+  return `${parts[0][0]}. ${last}`;
+}
+
+export interface LeaderboardData {
+  divisions: string[];
+  entries: Record<string, LeaderboardEntry[]>;
+}
+
+export async function getLeaderboard(slug: string): Promise<LeaderboardData> {
+  if (!supabase) {
+    return { divisions: mockDivisions, entries: mockLeaderboard };
+  }
+
+  const { data: competition, error: compError } = await supabase
+    .from("competitions")
+    .select("id")
+    .eq("slug", slug)
+    .maybeSingle();
+
+  if (compError || !competition) {
+    console.error("Supabase: Match nicht gefunden für Rangliste.", compError);
+    return { divisions: mockDivisions, entries: mockLeaderboard };
+  }
+
+  // Liest die öffentliche View statt results direkt: der Weg vom Ergebnis
+  // zum Namen führt über registrations, und die ist per RLS geschützt — für
+  // anonyme Besucher wäre der Join leer und die Rangliste damit leer
+  // (s. Migration 20260813121000).
+  const { data, error } = await supabase
+    .from("public_leaderboard")
+    .select(
+      `
+      scope, scope_ref_id, rank, points, percentage, hit_factor,
+      shooter_slug, shooter_name, shooter_country, division_name
+    `,
+    )
+    .eq("competition_id", competition.id)
+    .order("rank", { ascending: true });
+
+  if (error || !data) {
+    console.error("Supabase: Rangliste konnte nicht geladen werden.", error);
+    return { divisions: mockDivisions, entries: mockLeaderboard };
+  }
+
+  // Divisionsnamen für die Tab-Beschriftung: aus den Ergebniszeilen selbst,
+  // damit nur Divisionen erscheinen, für die es tatsächlich Wertungen gibt.
+  const divisionNameById = new Map<string, string>();
+  for (const row of data) {
+    if (row.scope === "division" && row.scope_ref_id && row.division_name) {
+      divisionNameById.set(row.scope_ref_id, row.division_name);
+    }
+  }
+
+  const entries: Record<string, LeaderboardEntry[]> = {};
+
+  for (const row of data) {
+    if (!row.shooter_name) continue;
+
+    const key =
+      row.scope === "overall"
+        ? "Overall"
+        : row.scope === "division" && row.scope_ref_id
+          ? (divisionNameById.get(row.scope_ref_id) ?? null)
+          : null;
+    if (!key) continue;
+
+    (entries[key] ??= []).push({
+      athleteId: row.shooter_slug ?? "",
+      rank: row.rank ?? 0,
+      name: abbreviateName(row.shooter_name),
+      country: row.shooter_country ?? "",
+      division: row.division_name ?? "",
+      points: Number(row.points ?? 0),
+      percentage: Number(row.percentage ?? 0),
+      hitFactor: Number(row.hit_factor ?? 0),
+      // Auf-/Abstieg gegenüber dem vorherigen Stand: dafür bräuchte es einen
+      // historisierten Rang, den results (ein Cache des aktuellen Standes)
+      // bewusst nicht führt. Ehrlich 0 statt einer erfundenen Bewegung —
+      // kommt zurück, wenn die Rules Engine Zwischenstände schreibt.
+      movement: 0,
+    });
+  }
+
+  // "Overall" immer zuerst, danach die Divisionen alphabetisch.
+  const divisionKeys = Object.keys(entries).filter((k) => k !== "Overall");
+  divisionKeys.sort((a, b) => a.localeCompare(b));
+
+  return {
+    divisions: [...(entries.Overall ? ["Overall"] : []), ...divisionKeys],
+    entries,
+  };
 }

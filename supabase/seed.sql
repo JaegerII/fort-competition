@@ -133,15 +133,17 @@ insert into squads (competition_id, name, capacity, scheduled_start, sort_order)
   ('c0a10000-0000-4000-8000-000000000002'::uuid, 'Squad 3', 10, '2026-09-12 19:00+02', 3);
 
 -- ── Schützen (alle OHNE Account — s. Kopfkommentar) ───────────────────
-insert into shooters (id, display_name, country) values
-  ('5400e700-0000-4000-8000-000000000001'::uuid, 'Lena Hoffmann',  'DE'),
-  ('5400e700-0000-4000-8000-000000000002'::uuid, 'Jonas Keller',   'DE'),
-  ('5400e700-0000-4000-8000-000000000003'::uuid, 'Mia Schneider',  'AT'),
-  ('5400e700-0000-4000-8000-000000000004'::uuid, 'Paul Richter',   'CH'),
-  ('5400e700-0000-4000-8000-000000000005'::uuid, 'Anna Novak',     'CZ'),
-  ('5400e700-0000-4000-8000-000000000006'::uuid, 'Sven Weber',     'DE'),
-  ('5400e700-0000-4000-8000-000000000007'::uuid, 'Tomas Dubois',   'FR'),
-  ('5400e700-0000-4000-8000-000000000008'::uuid, 'Karol Nowak',    'PL');
+-- Slugs entsprechen exakt den bisherigen Mock-IDs aus mock-data.ts, damit
+-- die bestehenden /athletes/<slug>-Routen unverändert funktionieren.
+insert into shooters (id, slug, display_name, country) values
+  ('5400e700-0000-4000-8000-000000000001'::uuid, 'l-hoffmann',  'Lena Hoffmann',  'DE'),
+  ('5400e700-0000-4000-8000-000000000002'::uuid, 'j-keller',    'Jonas Keller',   'DE'),
+  ('5400e700-0000-4000-8000-000000000003'::uuid, 'm-schneider', 'Mia Schneider',  'AT'),
+  ('5400e700-0000-4000-8000-000000000004'::uuid, 'p-richter',   'Paul Richter',   'CH'),
+  ('5400e700-0000-4000-8000-000000000005'::uuid, 'a-novak',     'Anna Novak',     'CZ'),
+  ('5400e700-0000-4000-8000-000000000006'::uuid, 's-weber',     'Sven Weber',     'DE'),
+  ('5400e700-0000-4000-8000-000000000007'::uuid, 't-dubois',    'Tomas Dubois',   'FR'),
+  ('5400e700-0000-4000-8000-000000000008'::uuid, 'k-nowak',     'Karol Nowak',    'PL');
 
 -- Statistiken nur für Lena, wie im Mock: die übrigen Profile haben bewusst
 -- keine ausgedachte Historie (Spec §13 — kein erfundener Insight).

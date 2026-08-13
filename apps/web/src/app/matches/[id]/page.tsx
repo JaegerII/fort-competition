@@ -1,5 +1,5 @@
 import { notFound } from "next/navigation";
-import { matches } from "@/lib/mock-data";
+import { getLeaderboard, getMatch, getMatchSlugs } from "@/lib/queries";
 import { matchStatusLabel, matchStatusTone } from "@/lib/match-status";
 import { Badge } from "@/components/badge";
 import { Leaderboard } from "@/components/leaderboard";
@@ -7,9 +7,16 @@ import { RegisterCta } from "@/components/register-cta";
 import { PersonalMatchCard } from "@/components/personal-match-card";
 
 // Statischer Export (GitHub Pages) kann nichts on-demand rendern — jede
-// Match-Detailseite muss beim Build bekannt sein.
-export function generateStaticParams() {
-  return matches.map((m) => ({ id: m.id }));
+// Match-Detailseite muss beim Build bekannt sein. Die Slugs kommen jetzt aus
+// der Datenbank; ohne DB fällt getMatchSlugs auf die Mock-IDs zurück.
+//
+// Das ist zugleich die Grenze des statischen Exports: ein Match, das NACH dem
+// Build entsteht, hat keine Seite. Genau dieser Punkt erzwingt später den
+// Wechsel auf serverseitiges Rendern — für den aktuellen Stand (Matches
+// stehen zur Build-Zeit fest) reicht es.
+export async function generateStaticParams() {
+  const slugs = await getMatchSlugs();
+  return slugs.map((slug) => ({ id: slug }));
 }
 export const dynamicParams = false;
 
@@ -19,7 +26,10 @@ export default async function MatchPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const match = matches.find((m) => m.id === id);
+  const [match, leaderboard] = await Promise.all([
+    getMatch(id),
+    getLeaderboard(id),
+  ]);
   if (!match) notFound();
 
   return (
@@ -82,7 +92,10 @@ export default async function MatchPage({
       <div className="grid grid-cols-1 gap-8 lg:grid-cols-[1fr_300px]">
         <div className="order-2 min-w-0 lg:order-none">
           <h2 className="mb-4 text-lg font-semibold">Rangliste</h2>
-          <Leaderboard />
+          <Leaderboard
+            divisions={leaderboard.divisions}
+            entries={leaderboard.entries}
+          />
         </div>
 
         {/* Auf Mobile vor die Rangliste — das eigene Ergebnis ist die
