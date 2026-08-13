@@ -1,7 +1,7 @@
 // Einmaliges Build-Skript, erzeugt public/icons/*.png aus dem FORT-Logo-Pfad.
 // Nicht Teil des Next-Builds — bei Bedarf manuell mit `node scripts/generate-icons.mjs` neu laufen lassen.
 import sharp from "sharp";
-import { mkdirSync, writeFileSync } from "fs";
+import { mkdirSync } from "fs";
 import { fileURLToPath } from "url";
 import { dirname, join } from "path";
 

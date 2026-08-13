@@ -47,6 +47,10 @@ export function RegistrationsProvider({ children }: { children: ReactNode }) {
     const raw = window.localStorage.getItem(STORAGE_KEY);
     if (raw) {
       try {
+        // Gleiche bewusste Ausnahme wie in auth-context.tsx: einmaliges
+        // Hydration-Read direkt nach dem Mount, kein Reagieren auf ein sich
+        // veränderndes externes System.
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setRegistrations(JSON.parse(raw));
       } catch {
         // ignore malformed storage

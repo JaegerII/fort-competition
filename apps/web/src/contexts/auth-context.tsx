@@ -35,6 +35,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const raw = window.localStorage.getItem(STORAGE_KEY);
     if (raw) {
       try {
+        // Bewusste Ausnahme von react-hooks/set-state-in-effect: das ist
+        // kein Reagieren auf ein sich veränderndes externes System, sondern
+        // ein einmaliges Hydration-Read direkt nach dem Mount (localStorage
+        // existiert serverseitig nicht, s. Kommentar unten zum Zweck) — es
+        // gibt dafür kein sinnvolles Nicht-Effect-Äquivalent.
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setUser(JSON.parse(raw));
       } catch {
         // ignore malformed storage
