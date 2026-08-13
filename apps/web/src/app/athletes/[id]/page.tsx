@@ -1,10 +1,13 @@
 import { notFound } from "next/navigation";
-import { athleteProfiles } from "@/lib/mock-data";
+import { getAthlete, getAthleteSlugs } from "@/lib/queries";
 import { Badge } from "@/components/badge";
 import { BackLink } from "@/components/back-link";
 
-export function generateStaticParams() {
-  return Object.keys(athleteProfiles).map((id) => ({ id }));
+// Slugs aus der Datenbank; ohne DB fällt getAthleteSlugs auf die Mock-IDs
+// zurück, damit der Build der GitHub-Pages-Demo weiterhin funktioniert.
+export async function generateStaticParams() {
+  const slugs = await getAthleteSlugs();
+  return slugs.map((slug) => ({ id: slug }));
 }
 export const dynamicParams = false;
 
@@ -25,7 +28,7 @@ export default async function AthleteProfilePage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const athlete = athleteProfiles[id];
+  const athlete = await getAthlete(id);
   if (!athlete) notFound();
 
   return (

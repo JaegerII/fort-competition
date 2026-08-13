@@ -149,9 +149,12 @@ insert into shooters (id, slug, display_name, country) values
 -- keine ausgedachte Historie (Spec §13 — kein erfundener Insight).
 insert into shooter_stats (
   shooter_id, matches_count, stages_count, podiums_count, wins_count,
-  avg_match_pct, avg_stage_pct, avg_hit_factor, a_zone_pct, penalty_rate, dnf_rate
+  avg_match_pct, avg_stage_pct, avg_hit_factor, a_zone_pct, penalty_rate,
+  dnf_rate, insight
 ) values
-  ('5400e700-0000-4000-8000-000000000001'::uuid, 34, 287, 6, 2, 91.40, 88.90, 7.4200, 82.30, 3.10, 0.00);
+  ('5400e700-0000-4000-8000-000000000001'::uuid, 34, 287, 6, 2, 91.40, 88.90,
+   7.4200, 82.30, 3.10, 0.00,
+   'Deine Stage-Prozente auf kurzen, transitionslastigen Stages liegen im Schnitt 6.2 Prozentpunkte unter deinem Match-Durchschnitt.');
 
 -- ── Registrierungen für das laufende Match ────────────────────────────
 insert into registrations (id, competition_id, shooter_id, division_id, status) values

@@ -1,8 +1,10 @@
 import { supabase } from "./supabase";
 import {
+  athleteProfiles as mockAthleteProfiles,
   divisions as mockDivisions,
   leaderboard as mockLeaderboard,
   matches as mockMatches,
+  type AthleteProfile,
   type LeaderboardEntry,
   type MatchStatus,
   type MatchSummary,
@@ -269,5 +271,189 @@ export async function getLeaderboard(slug: string): Promise<LeaderboardData> {
   return {
     divisions: [...(entries.Overall ? ["Overall"] : []), ...divisionKeys],
     entries,
+  };
+}
+
+// ── Athletenprofile ───────────────────────────────────────────────────
+
+// ISO-Code -> ausgeschriebener Name. Die Datenbank speichert bewusst den
+// Code (kurz, stabil, sprachneutral); ob "DE" oder "Deutschland" angezeigt
+// wird, ist Darstellungssache: die Rangliste zeigt den Code, weil dort jede
+// Spalte zählt, das Profil den vollen Namen im Fließtext.
+const countryNames: Record<string, string> = {
+  DE: "Deutschland",
+  AT: "Österreich",
+  CH: "Schweiz",
+  CZ: "Tschechien",
+  FR: "Frankreich",
+  PL: "Polen",
+};
+
+function countryLabel(code: string | null): string {
+  if (!code) return "";
+  return countryNames[code] ?? code;
+}
+
+
+export async function getAthleteSlugs(): Promise<string[]> {
+  if (!supabase) return Object.keys(mockAthleteProfiles);
+
+  const { data, error } = await supabase
+    .from("shooters")
+    .select("slug")
+    .not("slug", "is", null);
+
+  if (error || !data) {
+    console.error("Supabase: Athleten-Slugs nicht ladbar.", error);
+    return Object.keys(mockAthleteProfiles);
+  }
+  return data.map((s) => s.slug).filter((s): s is string => Boolean(s));
+}
+
+// Kurzprofil für die Athletenliste — ohne Historie und Analytics, die
+// braucht die Übersicht nicht.
+export interface AthleteListItem {
+  id: string;
+  fullName: string;
+  country: string;
+  primaryDivision: string;
+}
+
+// Die "primäre" Division ist die, in der ein Schütze am häufigsten
+// gewertet wurde — abgeleitet, nicht gepflegt. Ein eigenes Feld dafür
+// müsste bei jeder Registrierung nachgeführt werden und würde still
+// veralten.
+function primaryDivisionOf(divisionNames: (string | null)[]): string {
+  const counts = new Map<string, number>();
+  for (const name of divisionNames) {
+    if (name) counts.set(name, (counts.get(name) ?? 0) + 1);
+  }
+  let best = "";
+  let bestCount = 0;
+  for (const [name, count] of counts) {
+    if (count > bestCount) {
+      best = name;
+      bestCount = count;
+    }
+  }
+  return best;
+}
+
+export async function getAthletes(): Promise<AthleteListItem[]> {
+  if (!supabase) {
+    return Object.values(mockAthleteProfiles).map((a) => ({
+      id: a.id,
+      fullName: a.fullName,
+      country: a.country,
+      primaryDivision: a.primaryDivision,
+    }));
+  }
+
+  const [shootersResult, resultsResult] = await Promise.all([
+    supabase
+      .from("shooters")
+      .select("slug, display_name, country")
+      .not("slug", "is", null)
+      .order("display_name", { ascending: true }),
+    supabase.from("public_leaderboard").select("shooter_slug, division_name"),
+  ]);
+
+  if (shootersResult.error || !shootersResult.data) {
+    console.error("Supabase: Athleten nicht ladbar.", shootersResult.error);
+    return Object.values(mockAthleteProfiles).map((a) => ({
+      id: a.id,
+      fullName: a.fullName,
+      country: a.country,
+      primaryDivision: a.primaryDivision,
+    }));
+  }
+
+  const divisionsBySlug = new Map<string, (string | null)[]>();
+  for (const row of resultsResult.data ?? []) {
+    if (!row.shooter_slug) continue;
+    const list = divisionsBySlug.get(row.shooter_slug) ?? [];
+    list.push(row.division_name);
+    divisionsBySlug.set(row.shooter_slug, list);
+  }
+
+  return shootersResult.data.map((s) => ({
+    id: s.slug ?? "",
+    fullName: s.display_name,
+    country: countryLabel(s.country),
+    primaryDivision: primaryDivisionOf(divisionsBySlug.get(s.slug ?? "") ?? []),
+  }));
+}
+
+export async function getAthlete(slug: string): Promise<AthleteProfile | null> {
+  if (!supabase) return mockAthleteProfiles[slug] ?? null;
+
+  const { data: shooter, error } = await supabase
+    .from("shooters")
+    .select(
+      `
+      slug, display_name, country,
+      shooter_stats (
+        matches_count, stages_count, podiums_count, wins_count,
+        avg_match_pct, avg_stage_pct, avg_hit_factor,
+        a_zone_pct, penalty_rate, dnf_rate, insight
+      )
+    `,
+    )
+    .eq("slug", slug)
+    .maybeSingle();
+
+  if (error || !shooter) {
+    if (error) console.error("Supabase: Athlet nicht ladbar.", error);
+    return mockAthleteProfiles[slug] ?? null;
+  }
+
+  // Historie und primäre Division aus derselben öffentlichen View, die auch
+  // die Rangliste speist — nur andersherum gefiltert (s. Migration
+  // 20260813121100).
+  const { data: history } = await supabase
+    .from("public_leaderboard")
+    .select(
+      `
+      competition_name, competition_starts_at, competition_ends_at,
+      scope, rank, percentage, division_name
+    `,
+    )
+    .eq("shooter_slug", slug)
+    .order("competition_starts_at", { ascending: false });
+
+  const rows = history ?? [];
+  // Kein [0] wie bei public_competition_stats: shooter_stats hat shooter_id
+  // als Primärschlüssel und ist damit echtes 1:1 — Supabase liefert hier ein
+  // Objekt, kein Array. Der generierte Typ hat den Unterschied aufgedeckt.
+  const stats = shooter.shooter_stats;
+
+  return {
+    id: shooter.slug ?? slug,
+    fullName: shooter.display_name,
+    country: countryLabel(shooter.country),
+    primaryDivision: primaryDivisionOf(rows.map((r) => r.division_name)),
+    matches: stats?.matches_count ?? 0,
+    stages: stats?.stages_count ?? 0,
+    podiums: stats?.podiums_count ?? 0,
+    wins: stats?.wins_count ?? 0,
+    avgMatchPct: Number(stats?.avg_match_pct ?? 0),
+    avgStagePct: Number(stats?.avg_stage_pct ?? 0),
+    avgHitFactor: Number(stats?.avg_hit_factor ?? 0),
+    aZonePct: Number(stats?.a_zone_pct ?? 0),
+    penaltyRate: Number(stats?.penalty_rate ?? 0),
+    dnfRate: Number(stats?.dnf_rate ?? 0),
+    insight: stats?.insight ?? null,
+    history: rows
+      // Nur Gesamtwertungen in der Historie — die Divisionswertung desselben
+      // Matches wäre sonst eine zweite Zeile für dieselbe Teilnahme.
+      .filter((r) => r.scope === "overall")
+      .map((r) => ({
+        matchName: r.competition_name ?? "",
+        date: formatDateRange(r.competition_starts_at, r.competition_ends_at),
+        place: r.division_name
+          ? `#${r.rank} ${r.division_name}`
+          : `#${r.rank} Overall`,
+        matchPct: Number(r.percentage ?? 0),
+      })),
   };
 }

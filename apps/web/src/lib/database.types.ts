@@ -1022,6 +1022,7 @@ export type Database = {
           avg_stage_pct: number | null
           calculated_at: string
           dnf_rate: number | null
+          insight: string | null
           matches_count: number
           penalty_rate: number | null
           podiums_count: number
@@ -1036,6 +1037,7 @@ export type Database = {
           avg_stage_pct?: number | null
           calculated_at?: string
           dnf_rate?: number | null
+          insight?: string | null
           matches_count?: number
           penalty_rate?: number | null
           podiums_count?: number
@@ -1050,6 +1052,7 @@ export type Database = {
           avg_stage_pct?: number | null
           calculated_at?: string
           dnf_rate?: number | null
+          insight?: string | null
           matches_count?: number
           penalty_rate?: number | null
           podiums_count?: number
@@ -1411,7 +1414,11 @@ export type Database = {
       }
       public_leaderboard: {
         Row: {
+          competition_ends_at: string | null
           competition_id: string | null
+          competition_name: string | null
+          competition_slug: string | null
+          competition_starts_at: string | null
           division_name: string | null
           hit_factor: number | null
           percentage: number | null
