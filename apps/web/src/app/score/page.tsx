@@ -219,7 +219,12 @@ export default function ScorePage() {
   // ── Score-Erfassung ────────────────────────────────────────────
   if (mode === "score") {
     return (
-      <div className="max-w-2xl mx-auto px-4 pb-[calc(12rem+env(safe-area-inset-bottom))] pt-6 md:pb-32">
+      // pb-[14rem] statt der 12rem des Review-Screens (gleiche Bar sonst):
+      // die "Zeit fehlt"-Warnzeile macht den fixed Action-Bar zwei statt
+      // eine Zeile hoch, ohne mehr Bottom-Padding verschwand die letzte
+      // Strafen-Zeile unsichtbar dahinter — exakt die "kein scrollWidth-
+      // Overflow, aber Bounding-Rects überlappen trotzdem"-Falle.
+      <div className="max-w-2xl mx-auto px-4 pb-[calc(14rem+env(safe-area-inset-bottom))] pt-6 md:pb-36">
         <ScoreHeader
           shooter={shooter}
           offline={offline}
@@ -325,9 +330,15 @@ export default function ScorePage() {
 
         <div className="fixed inset-x-0 bottom-[calc(4rem+env(safe-area-inset-bottom))] border-t border-border bg-bg/95 backdrop-blur px-4 py-4 md:bottom-0">
           <div className="mx-auto max-w-2xl">
+            {timeNum <= 0 && (
+              <p className="mb-2 text-center text-sm text-warning">
+                Zeit fehlt — ein Schuss dauert nie 0.00 Sekunden.
+              </p>
+            )}
             <button
+              disabled={timeNum <= 0}
               onClick={() => setMode("review")}
-              className="w-full rounded-xl bg-accent py-4 text-lg font-semibold text-bg active:scale-[0.99] transition-transform"
+              className="w-full rounded-xl bg-accent py-4 text-lg font-semibold text-bg active:scale-[0.99] transition-transform disabled:opacity-30 disabled:pointer-events-none"
             >
               REVIEW SCORE
             </button>
