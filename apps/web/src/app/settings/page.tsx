@@ -1,14 +1,13 @@
 "use client";
 
 import { useState } from "react";
-import { ChevronRight, Download, Trash2 } from "lucide-react";
+import { ChevronRight, ChevronDown, Download, Trash2 } from "lucide-react";
 import { useAuth } from "@/contexts/auth-context";
 import { useRegistrations } from "@/contexts/registrations-context";
 
 const placeholderRows: { label: string; value?: string }[] = [
   { label: "Spracheinstellungen", value: "Deutsch" },
   { label: "Benachrichtigungen" },
-  { label: "Über FORT Competition" },
 ];
 
 // "Datenschutz" ist die einzige Settings-Zeile, die tatsächlich etwas tut —
@@ -22,6 +21,7 @@ export default function SettingsPage() {
   const { user, logout } = useAuth();
   const { registrations } = useRegistrations();
   const [confirmingDelete, setConfirmingDelete] = useState(false);
+  const [aboutOpen, setAboutOpen] = useState(false);
 
   function exportData() {
     const payload = {
@@ -67,6 +67,47 @@ export default function SettingsPage() {
       <p className="mt-2 text-xs text-text-faint">
         Platzhalter — nicht funktional verdrahtet.
       </p>
+
+      {/* "Über FORT Competition" war bis hierhin derselbe tote Platzhalter
+          wie Sprache/Benachrichtigungen — anders als die (echte Backend-/
+          i18n-Infrastruktur brauchen, um mehr als Kulisse zu sein) lässt
+          sich ein "Über"-Screen ehrlich und ohne Backend umsetzen: nur
+          statische Infos über den Prototyp selbst. */}
+      <div className="mt-3 overflow-hidden rounded-2xl border border-border bg-surface">
+        <button
+          onClick={() => setAboutOpen((v) => !v)}
+          className="flex w-full items-center justify-between px-4 py-3.5 text-left text-sm transition-colors hover:bg-surface-raised"
+        >
+          <span>Über FORT Competition</span>
+          <ChevronDown
+            size={16}
+            className={`text-text-faint transition-transform ${aboutOpen ? "rotate-180" : ""}`}
+          />
+        </button>
+        {aboutOpen && (
+          <div className="space-y-3 border-t border-border px-4 py-4 text-sm text-text-muted">
+            <p>
+              Klickbarer Prototyp (Phase 6 der Produktspezifikation, vorgezogen)
+              — Match Discovery, Live-Ergebnisse, RO-Scoring-Loop und
+              Match-Director-Wizard. Fake-Daten, kein Backend, keine echte
+              Ruleset-Engine.
+            </p>
+            <p>
+              Teil des FORT-Ökosystems, neben der bestehenden{" "}
+              <span className="text-text">FORT Performance</span>-App
+              (Trainingstracking).
+            </p>
+            <a
+              href="https://github.com/JaegerII/fort-competition"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-block text-accent hover:underline"
+            >
+              Quellcode auf GitHub →
+            </a>
+          </div>
+        )}
+      </div>
 
       <h2 className="mb-3 mt-8 text-sm font-semibold uppercase tracking-wide text-text-muted">
         Datenschutz
