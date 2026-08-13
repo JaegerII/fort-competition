@@ -324,6 +324,18 @@ export default function NewMatchWizardPage() {
                     </Field>
                   </div>
                 </div>
+                {/* Nicht blockierend, anders als Ruleset/Name: Datum bleibt
+                    optional (kann später ergänzt werden), aber ein bereits
+                    gesetztes Enddatum vor dem Startdatum ist nie sinnvoll —
+                    ohne Hinweis würde das unbemerkt bis in den Review-Schritt
+                    und potenziell bis zur Veröffentlichung durchrutschen. */}
+                {data.info.dateFrom &&
+                  data.info.dateTo &&
+                  data.info.dateTo < data.info.dateFrom && (
+                    <p className="mt-3 text-sm text-warning">
+                      Enddatum liegt vor dem Startdatum.
+                    </p>
+                  )}
               </div>
             )}
 
@@ -516,6 +528,15 @@ export default function NewMatchWizardPage() {
                     />
                   </Field>
                 </div>
+                {/* Gleiches Prinzip wie die Datumsprüfung im Info-Schritt —
+                    nicht blockierend, nur ein Hinweis. */}
+                {data.registration.opensAt &&
+                  data.registration.closesAt &&
+                  data.registration.closesAt < data.registration.opensAt && (
+                    <p className="mt-3 text-sm text-warning">
+                      Schließt-Datum liegt vor dem Öffnen-Datum.
+                    </p>
+                  )}
               </div>
             )}
 
